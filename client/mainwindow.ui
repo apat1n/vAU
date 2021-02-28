@@ -36,7 +36,7 @@
         <x>270</x>
         <y>160</y>
         <width>258</width>
-        <height>275</height>
+        <height>339</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -61,7 +61,7 @@
         <widget class="QTextEdit" name="inputPassword"/>
        </item>
        <item alignment="Qt::AlignHCenter">
-        <widget class="QLabel" name="labelError">
+        <widget class="QLabel" name="errorLogin">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -77,6 +77,26 @@
         <widget class="QPushButton" name="signIn">
          <property name="text">
           <string>Sign in</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="registerButton">
+         <property name="text">
+          <string>Register</string>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignHCenter">
+        <widget class="QLabel" name="errorRegister">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(239, 41, 41);</string>
+         </property>
+         <property name="text">
+          <string>This user already exists</string>
          </property>
         </widget>
        </item>

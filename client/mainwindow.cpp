@@ -6,7 +6,8 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), client(server_url) {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
-    ui->labelError->hide();
+    ui->errorLogin->hide();
+    ui->errorRegister->hide();
 
     client.connectServer();
 }
@@ -46,13 +47,25 @@ void MainWindow::on_signIn_clicked() {
     QString login = ui->inputLogin->toPlainText();
     QString password = ui->inputPassword->toPlainText();
 
-    if (client.login(login, password)) {
+    if (client.loginUser(login, password)) {
         ui->stackedWidget->setCurrentIndex(1);
-        ui->labelError->hide();
+        ui->errorLogin->hide();
     } else {
-        ui->labelError->show();
+        ui->errorLogin->show();
     }
     ui->inputPassword->clear();
+}
+
+void MainWindow::on_registerButton_clicked() {
+    QString login = ui->inputLogin->toPlainText();
+    QString password = ui->inputPassword->toPlainText();
+
+    if (client.registerUser(login, password)) {
+        ui->stackedWidget->setCurrentIndex(1);
+        ui->errorRegister->hide();
+    } else {
+        ui->errorRegister->show();
+    }
 }
 
 void MainWindow::on_pushButton_2_clicked() {

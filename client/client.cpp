@@ -62,7 +62,29 @@ void Client::onBinaryMessageReceived(QByteArray message) {
     emit responseRecieved();
 }
 
-bool Client::login(QString login, QString password) {
+void Client::waitResponse() {
+    QTimer timer;
+    timer.setSingleShot(true);
+    QEventLoop loop;
+    connect(this, &Client::responseRecieved, &loop, &QEventLoop::quit);
+    connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+    timer.start(5000);  // wait for 5s to get response
+    loop.exec();
+}
+
+void Client::sendRequest(const QJsonObject &requestObj) {
+    if (m_webSocket.state() != QAbstractSocket::SocketState::ConnectedState) {
+        connectServer();
+    }
+
+    QByteArray requestBinaryMessage = QJsonDocument(requestObj).toJson();
+    qDebug() << requestBinaryMessage;
+
+    m_webSocket.sendBinaryMessage(requestBinaryMessage);
+    waitResponse();
+}
+
+bool Client::loginUser(QString login, QString password) {
     QJsonObject message;
     message["login"] = login;
     message["password"] = password;
@@ -74,19 +96,7 @@ bool Client::login(QString login, QString password) {
     QJsonObject requestObj;
     requestObj["request"] = request;
 
-    QByteArray requestBinaryMessage = QJsonDocument(requestObj).toJson();
-    qDebug() << requestBinaryMessage;
-
-    m_webSocket.sendBinaryMessage(requestBinaryMessage);
-
-    QTimer timer;
-    timer.setSingleShot(true);
-    QEventLoop loop;
-    connect(this, &Client::responseRecieved, &loop, &QEventLoop::quit);
-    connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-    timer.start(5000);  // wait for 5s to get response
-    loop.exec();
-
+    sendRequest(requestObj);
     if (responseObj->empty()) {
         return false;
     }
@@ -94,5 +104,32 @@ bool Client::login(QString login, QString password) {
     QJsonObject responseBody = responseObj->value("request").toObject();
     QString method = responseBody.value("method").toString();
     int status = responseBody.value("status").toInt();
+    responseObj.reset();
+
     return method == "login" && status == 200;
+}
+
+bool Client::registerUser(QString login, QString password) {
+    QJsonObject message;
+    message["login"] = login;
+    message["password"] = password;
+
+    QJsonObject request;
+    request["method"] = "register";
+    request["message"] = message;
+
+    QJsonObject requestObj;
+    requestObj["request"] = request;
+
+    sendRequest(requestObj);
+    if (responseObj->empty()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("request").toObject();
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
+    responseObj.reset();
+
+    return method == "register" && status == 200;
 }

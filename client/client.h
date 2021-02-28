@@ -35,7 +35,10 @@ private:
     std::optional<QJsonObject> responseObj;
 
 public:
-    bool login(QString login, QString password);
+    void waitResponse();
+    void sendRequest(const QJsonObject &requestObj);
+    bool loginUser(QString login, QString password);
+    bool registerUser(QString login, QString password);
 };
 
 #endif  // ECHOCLIENT_H
