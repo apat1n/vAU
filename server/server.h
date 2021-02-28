@@ -38,8 +38,11 @@ private:
     bool m_debug;
 
     void processLoginRequest(QJsonObject, QWebSocket *);
+    void processRegisterRequest(QJsonObject, QWebSocket *);
+//    void processSendMessageRequest(QJsonObject, QWebSocket *);
 
     bool authUser(User *, QString);
+    bool registerUser(QString, QString);
     User *registerUser();
     Chat *createChat();
 };

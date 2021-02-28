@@ -72,7 +72,10 @@ void Server::processBinaryMessage(QByteArray message) {
 
     if (requestMethod == "login") {
         processLoginRequest(requestBody, pSender);
+    } else if (requestMethod == "register") {
+        processRegisterRequest(requestBody, pSender);
     } else if (requestMethod == "sendMessage") {
+//        processSendMessageRequest(requestBody, pSender);
         //        for (QWebSocket *pClient : qAsConst(m_clients)) {
         //            if (pClient != pSender) {
         //                pClient->sendTextMessage(message);
@@ -141,4 +144,41 @@ bool Server::authUser(User *user, QString password) {
     } else {
         return false;
     }
+}
+
+void Server::processRegisterRequest(QJsonObject requestBody, QWebSocket *pSender) {
+    QJsonObject requestMessage = requestBody.value("message").toObject();
+    QString login = requestMessage.value("login").toString();
+    QString password = requestMessage.value("password").toString();
+
+    QJsonObject response;
+    response["method"] = "register";
+    response["message"] = "";
+
+    if (registerUser(login, password)) {
+        response["status"] = 200;
+    } else {
+        response["status"] = 409;
+    }
+
+    QJsonObject responseObj;
+    responseObj["request"] = response;
+
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
+bool Server::registerUser(QString login, QString password) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+    ss << "INSERT INTO QUSER (login, password_hash) VALUES ('"
+       << login.toStdString() << "', '"
+       << password.toStdString() << "');";
+    if (m_debug) {
+        qDebug() << "register user" << QString::fromStdString(ss.str());
+    }
+    return query.exec(QString::fromStdString(ss.str()));
 }
