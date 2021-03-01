@@ -96,13 +96,21 @@ bool Client::sendMessage(QString text, QString chatId) {
     QJsonObject request;
     request["message"] = message;
     request["method"] = "sendMessage";
-    sendRequest(request);
+
+    QJsonObject requestObj;
+    requestObj["request"] = request;
+
+    sendRequest(requestObj);
     if (responseObj->empty()) {
         return false;
     }
-    int status = responseObj->value("status").toInt();
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
     responseObj.reset();
-    return status == 200;
+
+    return method == request["method"].toString() && status == 200;
 }
 
 bool Client::createChat(QString name) {
@@ -110,20 +118,23 @@ bool Client::createChat(QString name) {
     message["name"] = name;
 
     QJsonObject request;
-    request["method"] = "logout";
+    request["method"] = "createChat";
     request["message"] = message;
 
-    sendRequest(request);
+    QJsonObject requestObj;
+    requestObj["request"] = request;
+
+    sendRequest(requestObj);
     if (responseObj->empty()) {
         return false;
     }
 
     QJsonObject responseBody = responseObj->value("response").toObject();
     QString method = responseBody.value("method").toString();
-    int status = responseObj->value("status").toInt();
+    int status = responseBody.value("status").toInt();
     responseObj.reset();
 
-    return method == "createChat" && status == 200;
+    return method == request["method"].toString() && status == 200;
 }
 
 bool Client::logoutUser() {
@@ -131,17 +142,20 @@ bool Client::logoutUser() {
     request["method"] = "logout";
     request["message"] = "";
 
-    sendRequest(request);
+    QJsonObject requestObj;
+    requestObj["request"] = request;
+
+    sendRequest(requestObj);
     if (responseObj->empty()) {
         return false;
     }
 
     QJsonObject responseBody = responseObj->value("response").toObject();
-    int status = responseObj->value("status").toInt();
     QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
     responseObj.reset();
 
-    return method == "logout" && status == 200;
+    return method == request["method"].toString() && status == 200;
 }
 
 bool Client::loginUser(QString login, QString password) {
@@ -166,7 +180,7 @@ bool Client::loginUser(QString login, QString password) {
     int status = responseBody.value("status").toInt();
     responseObj.reset();
 
-    return method == "login" && status == 200;
+    return method == request["method"].toString() && status == 200;
 }
 
 bool Client::registerUser(QString login, QString password) {
@@ -191,5 +205,5 @@ bool Client::registerUser(QString login, QString password) {
     int status = responseBody.value("status").toInt();
     responseObj.reset();
 
-    return method == "register" && status == 200;
+    return method == request["method"].toString() && status == 200;
 }

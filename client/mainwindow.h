@@ -28,6 +28,7 @@ private slots:
     void on_registerButton_clicked();
 
     void on_signOut_clicked();
+
 private:
     Ui::MainWindow *ui;
     Client client;

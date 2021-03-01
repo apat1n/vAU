@@ -38,7 +38,7 @@ void MainWindow::on_signIn_clicked() {
 }
 
 void MainWindow::on_signOut_clicked() {
-    if (client.logoutUser()){
+    if (client.logoutUser()) {
         ui->stackedWidget->setCurrentIndex(0);
     }
 }
