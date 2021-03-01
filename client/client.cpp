@@ -106,20 +106,30 @@ bool Client::sendMessage(QString text, QString chatId) {
 }
 
 bool Client::createChat(QString name) {
+    QJsonObject message;
+    message["name"] = name;
+
     QJsonObject request;
-    request["name"] = name;
+    request["method"] = "logout";
+    request["message"] = message;
+
     sendRequest(request);
     if (responseObj->empty()) {
         return false;
     }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QString method = responseBody.value("method").toString();
     int status = responseObj->value("status").toInt();
     responseObj.reset();
-    return status == 200;
+
+    return method == "createChat" && status == 200;
 }
 
 bool Client::logoutUser() {
     QJsonObject request;
-    request["logout"] = "logout";
+    request["method"] = "logout";
+    request["message"] = "";
 
     sendRequest(request);
     if (responseObj->empty()) {
@@ -128,8 +138,10 @@ bool Client::logoutUser() {
 
     QJsonObject responseBody = responseObj->value("response").toObject();
     int status = responseObj->value("status").toInt();
+    QString method = responseBody.value("method").toString();
     responseObj.reset();
-    return status == 200;
+
+    return method == "logout" && status == 200;
 }
 
 bool Client::loginUser(QString login, QString password) {
