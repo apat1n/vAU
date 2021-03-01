@@ -6,9 +6,9 @@
 #include "user.h"
 
 struct Chat {
-    QString chatId;
-
-    QList<User *> getUsers();
+    int id;
+    QString name;
+    QDate lastUpdated;
 };
 
 #endif  // CHAT_H

@@ -7,11 +7,9 @@
 #include "common.h"
 
 struct User {
+    int id;
     QString login;
     QWebSocket *senderId;
-    bool isAuthenticated = false;
-
-    QList<Chat *> getChats();
 };
 
 #endif  // USER_H

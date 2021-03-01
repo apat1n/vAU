@@ -32,19 +32,22 @@ private Q_SLOTS:
 private:
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
-    QList<User *> users;
-    QList<Chat *> chats;
+    QMap<QWebSocket *, User> authenticatedUsers;
     QSqlDatabase db;
     bool m_debug;
 
+    void processLogoutRequest(QWebSocket *);
     void processLoginRequest(QJsonObject, QWebSocket *);
-    void processRegisterRequest(QJsonObject, QWebSocket *);
-//    void processSendMessageRequest(QJsonObject, QWebSocket *);
+    std::optional<User> processRegisterRequest(QJsonObject, QWebSocket *);
+    void processGetChatListRequest(QJsonObject, QWebSocket *);
+    //    void proccessChatGetMessages(QJsonObject, QWebSocket *);
+    //    void processSendMessageRequest(QJsonObject, QWebSocket *);
 
-    bool authUser(User *, QString);
+    bool authUser(User &, QString);
     bool registerUser(QString, QString);
-    User *registerUser();
-    Chat *createChat();
+
+    bool createChat();
+    QList<Chat> getChatList(User &);
 };
 
 #endif  // SERVER_H

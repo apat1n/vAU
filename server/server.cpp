@@ -1,4 +1,5 @@
 #include "server.h"
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
@@ -74,8 +75,10 @@ void Server::processBinaryMessage(QByteArray message) {
         processLoginRequest(requestBody, pSender);
     } else if (requestMethod == "register") {
         processRegisterRequest(requestBody, pSender);
+    } else if (requestMethod == "getChatList") {
+        processGetChatListRequest(requestBody, pSender);
     } else if (requestMethod == "sendMessage") {
-//        processSendMessageRequest(requestBody, pSender);
+        //        processSendMessageRequest(requestBody, pSender);
         //        for (QWebSocket *pClient : qAsConst(m_clients)) {
         //            if (pClient != pSender) {
         //                pClient->sendTextMessage(message);
@@ -100,21 +103,21 @@ void Server::processLoginRequest(QJsonObject requestBody, QWebSocket *pSender) {
     QString login = requestMessage.value("login").toString();
     QString password = requestMessage.value("password").toString();
 
-    User *user = new User{login, qobject_cast<QWebSocket *>(sender())};
+    User user{-1, login, pSender};
 
     QJsonObject response;
     response["method"] = "login";
     response["message"] = "";
 
     if (authUser(user, password)) {
-        users << user;
+        authenticatedUsers[pSender] = user;
         response["status"] = 200;
     } else {
         response["status"] = 401;
     }
 
     QJsonObject responseObj;
-    responseObj["request"] = response;
+    responseObj["response"] = response;
 
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
     if (m_debug) {
@@ -123,9 +126,9 @@ void Server::processLoginRequest(QJsonObject requestBody, QWebSocket *pSender) {
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
 
-bool Server::authUser(User *user, QString password) {
+bool Server::authUser(User &user, QString password) {
     QSqlQuery query(db);
-    QString queryLogin = user->login;
+    QString queryLogin = user.login;
     std::stringstream ss;
     ss << "SELECT * FROM QUser WHERE login = '" << queryLogin.toStdString()
        << "';";
@@ -136,17 +139,17 @@ bool Server::authUser(User *user, QString password) {
     }
 
     query.next();
+    int id = query.value(0).toInt();
     QString login = query.value(1).toString();
     QString password_hash = query.value(2).toString();
-    if (password_hash == password) {
-        user->isAuthenticated = true;
-        return true;
-    } else {
-        return false;
-    }
+
+    user.id = id;
+
+    return password_hash == password;
 }
 
-void Server::processRegisterRequest(QJsonObject requestBody, QWebSocket *pSender) {
+std::optional<User> Server::processRegisterRequest(QJsonObject requestBody,
+                                                   QWebSocket *pSender) {
     QJsonObject requestMessage = requestBody.value("message").toObject();
     QString login = requestMessage.value("login").toString();
     QString password = requestMessage.value("password").toString();
@@ -162,7 +165,46 @@ void Server::processRegisterRequest(QJsonObject requestBody, QWebSocket *pSender
     }
 
     QJsonObject responseObj;
-    responseObj["request"] = response;
+    responseObj["response"] = response;
+
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+
+    pSender->sendBinaryMessage(responseBinaryMessage);
+
+    std::optional<User> user;
+    if (response["status"] == 200) {
+        user = User({-1, login, pSender});
+        authUser(*user, password);
+    }
+    return user;
+}
+
+bool Server::registerUser(QString login, QString password) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+    ss << "INSERT INTO QUSER (login, password_hash) VALUES ('"
+       << login.toStdString() << "', '" << password.toStdString() << "');";
+    if (m_debug) {
+        qDebug() << "register user" << QString::fromStdString(ss.str());
+    }
+    return query.exec(QString::fromStdString(ss.str()));
+}
+
+void Server::processLogoutRequest(QWebSocket *pSender) {
+    if (!authenticatedUsers.contains(pSender)) {
+        authenticatedUsers.remove(pSender);
+    }
+
+    QJsonObject response;
+    response["method"] = "logout";
+    response["message"] = "";
+    response["status"] = 200;
+
+    QJsonObject responseObj;
+    responseObj["response"] = response;
 
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
     if (m_debug) {
@@ -171,14 +213,57 @@ void Server::processRegisterRequest(QJsonObject requestBody, QWebSocket *pSender
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
 
-bool Server::registerUser(QString login, QString password) {
+void Server::processGetChatListRequest(QJsonObject requestBody,
+                                       QWebSocket *pSender) {
+    if (!authenticatedUsers.contains(pSender)) {
+        QJsonObject response;
+        response["method"] = "getChats";
+        response["message"] = "";
+        response["status"] = 403;
+
+        QJsonObject responseObj;
+        responseObj["response"] = response;
+
+        QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+        return;
+    }
+
+    QJsonObject requestMessage = requestBody.value("message").toObject();
+    QString login = requestMessage.value("login").toString();
+    QString password = requestMessage.value("password").toString();
+
+    QJsonObject response;
+    response["method"] = "getChatList";
+    response["message"] = "";
+    response["content"] = QJsonArray();
+
+    User user = authenticatedUsers[pSender];
+    for (auto chat : getChatList(user)) {
+    }
+
+    QJsonObject responseObj;
+    responseObj["response"] = response;
+
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
+QList<Chat> Server::getChatList(User &user) {
     QSqlQuery query(db);
     std::stringstream ss;
-    ss << "INSERT INTO QUSER (login, password_hash) VALUES ('"
-       << login.toStdString() << "', '"
-       << password.toStdString() << "');";
-    if (m_debug) {
-        qDebug() << "register user" << QString::fromStdString(ss.str());
+    ss << "SELECT id, name FROM QChat JOIN QChatUserList ON chat_id = id WHERE "
+          "user_id = "
+       << user.id << ";";
+
+    QList<Chat> result;
+    while (query.next()) {
+        int id = query.value(0).toInt();
+        QString name = query.value(1).toString();
+        QDate lastUpdated = query.value(2).toDate();
+        result << Chat{id, name, lastUpdated};
     }
-    return query.exec(QString::fromStdString(ss.str()));
+    return result;
 }

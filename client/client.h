@@ -35,6 +35,10 @@ private:
     std::optional<QJsonObject> responseObj;
 
 public:
+    bool sendMessage(QString text, QString chatId);
+    bool logoutUser();
+    QJsonArray searchMessage(QString message, QString chatId);
+    bool createChat(QString name);
     void waitResponse();
     void sendRequest(const QJsonObject &requestObj);
     bool loginUser(QString login, QString password);

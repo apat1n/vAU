@@ -8,8 +8,8 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->stackedWidget->setCurrentIndex(0);
     ui->errorLogin->hide();
     ui->errorRegister->hide();
-
     client.connectServer();
+    ui->inputPassword->setEchoMode(QLineEdit::Password);
 }
 
 MainWindow::~MainWindow() {
@@ -44,8 +44,8 @@ void MainWindow::on_SendButton_clicked() {
 }
 
 void MainWindow::on_signIn_clicked() {
-    QString login = ui->inputLogin->toPlainText();
-    QString password = ui->inputPassword->toPlainText();
+    QString login = ui->inputLogin->text();
+    QString password = ui->inputPassword->text();
 
     if (client.loginUser(login, password)) {
         ui->stackedWidget->setCurrentIndex(1);
@@ -57,8 +57,8 @@ void MainWindow::on_signIn_clicked() {
 }
 
 void MainWindow::on_registerButton_clicked() {
-    QString login = ui->inputLogin->toPlainText();
-    QString password = ui->inputPassword->toPlainText();
+    QString login = ui->inputLogin->text();
+    QString password = ui->inputPassword->text();
 
     if (client.registerUser(login, password)) {
         ui->stackedWidget->setCurrentIndex(1);

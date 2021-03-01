@@ -47,8 +47,8 @@
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignHCenter">
-        <widget class="QTextEdit" name="inputLogin"/>
+       <item>
+        <widget class="QLineEdit" name="inputLogin"/>
        </item>
        <item alignment="Qt::AlignHCenter">
         <widget class="QLabel" name="labelPassword">
@@ -57,8 +57,8 @@
          </property>
         </widget>
        </item>
-       <item alignment="Qt::AlignRight">
-        <widget class="QTextEdit" name="inputPassword"/>
+       <item>
+        <widget class="QLineEdit" name="inputPassword"/>
        </item>
        <item alignment="Qt::AlignHCenter">
         <widget class="QLabel" name="errorLogin">

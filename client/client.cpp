@@ -48,6 +48,10 @@ QString Client::getState() const {
     return "Unknown";
 }
 
+// QJsonArray Client::searchMessage(QString message, QString chatId){
+
+//}
+
 void Client::onConnected() {
     if (m_debug) {
         qDebug() << "WebSocket connected";
@@ -84,6 +88,50 @@ void Client::sendRequest(const QJsonObject &requestObj) {
     waitResponse();
 }
 
+bool Client::sendMessage(QString text, QString chatId) {
+    QJsonObject message;
+    message["text"] = text;
+    message["chatId"] = chatId;
+
+    QJsonObject request;
+    request["message"] = message;
+    request["method"] = "sendMessage";
+    sendRequest(request);
+    if (responseObj->empty()) {
+        return false;
+    }
+    int status = responseObj->value("status").toInt();
+    responseObj.reset();
+    return status == 200;
+}
+
+bool Client::createChat(QString name) {
+    QJsonObject request;
+    request["name"] = name;
+    sendRequest(request);
+    if (responseObj->empty()) {
+        return false;
+    }
+    int status = responseObj->value("status").toInt();
+    responseObj.reset();
+    return status == 200;
+}
+
+bool Client::logoutUser() {
+    QJsonObject request;
+    request["logout"] = "logout";
+
+    sendRequest(request);
+    if (responseObj->empty()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    int status = responseObj->value("status").toInt();
+    responseObj.reset();
+    return status == 200;
+}
+
 bool Client::loginUser(QString login, QString password) {
     QJsonObject message;
     message["login"] = login;
@@ -101,7 +149,7 @@ bool Client::loginUser(QString login, QString password) {
         return false;
     }
 
-    QJsonObject responseBody = responseObj->value("request").toObject();
+    QJsonObject responseBody = responseObj->value("response").toObject();
     QString method = responseBody.value("method").toString();
     int status = responseBody.value("status").toInt();
     responseObj.reset();
@@ -126,7 +174,7 @@ bool Client::registerUser(QString login, QString password) {
         return false;
     }
 
-    QJsonObject responseBody = responseObj->value("request").toObject();
+    QJsonObject responseBody = responseObj->value("response").toObject();
     QString method = responseBody.value("method").toString();
     int status = responseBody.value("status").toInt();
     responseObj.reset();
