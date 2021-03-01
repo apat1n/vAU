@@ -77,6 +77,8 @@ void Server::processBinaryMessage(QByteArray message) {
         processRegisterRequest(requestBody, pSender);
     } else if (requestMethod == "getChatList") {
         processGetChatListRequest(requestBody, pSender);
+    } else if (requestMethod == "logout") {
+        processLogoutRequest(pSender);
     } else if (requestMethod == "sendMessage") {
         //        processSendMessageRequest(requestBody, pSender);
         //        for (QWebSocket *pClient : qAsConst(m_clients)) {
