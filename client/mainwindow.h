@@ -15,7 +15,6 @@ class MainWindow : public QMainWindow {
 
 public:
     MainWindow(const QString &, QWidget * = nullptr);
-    void updateDebugText(const QString &);
     ~MainWindow();
 
 private slots:
