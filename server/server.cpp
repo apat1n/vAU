@@ -82,12 +82,7 @@ void Server::processBinaryMessage(QByteArray message) {
     } else if (requestMethod == "createChat") {
         processCreateChatRequest(requestBody, pSender);
     } else if (requestMethod == "sendMessage") {
-        //        processSendMessageRequest(requestBody, pSender);
-        //        for (QWebSocket *pClient : qAsConst(m_clients)) {
-        //            if (pClient != pSender) {
-        //                pClient->sendTextMessage(message);
-        //            }
-        //        }
+        processSendMessageRequest(requestBody, pSender);
     }
 }
 
@@ -152,8 +147,8 @@ bool Server::authUser(User &user, QString password) {
     return password_hash == password;
 }
 
-std::optional<User> Server::processRegisterRequest(QJsonObject requestBody,
-                                                   QWebSocket *pSender) {
+void Server::processRegisterRequest(QJsonObject requestBody,
+                                    QWebSocket *pSender) {
     QJsonObject requestMessage = requestBody.value("message").toObject();
     QString login = requestMessage.value("login").toString();
     QString password = requestMessage.value("password").toString();
@@ -178,12 +173,11 @@ std::optional<User> Server::processRegisterRequest(QJsonObject requestBody,
 
     pSender->sendBinaryMessage(responseBinaryMessage);
 
-    std::optional<User> user;
     if (response["status"] == 200) {
-        user = User({-1, login, pSender});
-        authUser(*user, password);
+        User user = User({-1, login, pSender});
+        authUser(user, password);
+        authenticatedUsers[pSender] = user;
     }
-    return user;
 }
 
 bool Server::registerUser(QString login, QString password) {
@@ -195,7 +189,8 @@ bool Server::registerUser(QString login, QString password) {
     return query.exec(QString::fromStdString(ss.str()));
 }
 
-void Server::processLogoutRequest(QJsonObject requestBody, QWebSocket *pSender) {
+void Server::processLogoutRequest(QJsonObject requestBody,
+                                  QWebSocket *pSender) {
     if (!authenticatedUsers.contains(pSender)) {
         authenticatedUsers.remove(pSender);
     }
@@ -270,7 +265,8 @@ QList<Chat> Server::getChatList(User &user) {
     return result;
 }
 
-void Server::processCreateChatRequest(QJsonObject requestBody, QWebSocket *pSender) {
+void Server::processCreateChatRequest(QJsonObject requestBody,
+                                      QWebSocket *pSender) {
     if (!authenticatedUsers.contains(pSender)) {
         QJsonObject response;
         response["method"] = requestBody.value("method").toString();
@@ -287,13 +283,12 @@ void Server::processCreateChatRequest(QJsonObject requestBody, QWebSocket *pSend
     QJsonObject requestMessage = requestBody.value("message").toObject();
     QString name = requestMessage.value("name").toString();
 
-
-
     QJsonObject response;
     response["method"] = requestBody.value("method").toString();
     response["message"] = "";
     response["content"] = QJsonArray();
 
+    // TODO: send chat list
     User user = authenticatedUsers[pSender];
     for (auto chat : getChatList(user)) {
     }
@@ -312,6 +307,46 @@ bool Server::createChat(QString name) {
     QSqlQuery query(db);
     std::stringstream ss;
     ss << "INSERT INTO QChat (name) VALUES ('" << name.toStdString() << "');";
+
+    return query.exec(QString::fromStdString(ss.str()));
+}
+
+void Server::processSendMessageRequest(QJsonObject requestBody,
+                                       QWebSocket *pSender) {
+    if (!authenticatedUsers.contains(pSender)) {
+        QJsonObject response;
+        response["method"] = requestBody.value("method").toString();
+        response["message"] = "";
+        response["status"] = 403;
+
+        QJsonObject responseObj;
+        responseObj["response"] = response;
+
+        QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+        return;
+    }
+
+    QJsonObject requestMessage = requestBody.value("message").toObject();
+    QString name = requestMessage.value("name").toString();
+
+    int chat_id = requestMessage.value("chatId").toInt();
+    int user_id = authenticatedUsers[pSender].id;
+    QString text_message = requestMessage.value("content").toString();
+    QDate date = QDate::currentDate();
+
+    createMesage(chat_id, user_id, text_message, date);
+}
+
+bool Server::createMesage(int chat_id,
+                          int user_id,
+                          QString message,
+                          QDate date) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+    ss << "INSERT INTO QChatMessages (chat_id, user_id, message, message_date) "
+       << "VALUES ('" << chat_id << ", " << user_id << ", "
+       << message.toStdString() << ", " << date.toString().toStdString()
+       << "');";
 
     return query.exec(QString::fromStdString(ss.str()));
 }

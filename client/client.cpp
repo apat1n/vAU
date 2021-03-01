@@ -90,7 +90,7 @@ void Client::sendRequest(const QJsonObject &requestObj) {
 
 bool Client::sendMessage(QString text, QString chatId) {
     QJsonObject message;
-    message["text"] = text;
+    message["content"] = text;
     message["chatId"] = chatId;
 
     QJsonObject request;

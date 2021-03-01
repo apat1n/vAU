@@ -37,18 +37,20 @@ private:
     bool m_debug;
 
     void processLoginRequest(QJsonObject, QWebSocket *);
-    std::optional<User> processRegisterRequest(QJsonObject, QWebSocket *);
+    void processRegisterRequest(QJsonObject, QWebSocket *);
     void processLogoutRequest(QJsonObject, QWebSocket *);
     void processGetChatListRequest(QJsonObject, QWebSocket *);
     void processCreateChatRequest(QJsonObject, QWebSocket *);
     //    void proccessChatGetMessages(QJsonObject, QWebSocket *);
-    //    void processSendMessageRequest(QJsonObject, QWebSocket *);
+    void processSendMessageRequest(QJsonObject, QWebSocket *);
 
     bool authUser(User &, QString);
     bool registerUser(QString, QString);
 
     bool createChat(QString);
     QList<Chat> getChatList(User &);
+
+    bool createMesage(int, int, QString, QDate);
 };
 
 #endif  // SERVER_H
