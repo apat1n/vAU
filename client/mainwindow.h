@@ -17,6 +17,9 @@ public:
     MainWindow(const QString &, QWidget * = nullptr);
     ~MainWindow();
 
+Q_SIGNALS:
+    void connectionUnstable();
+
 private slots:
 
     void on_SendButton_clicked();
@@ -30,6 +33,8 @@ private slots:
     void on_signOut_clicked();
 
 private:
+    void onConnectionUnstable();
+
     Ui::MainWindow *ui;
     Client client;
 };

@@ -22,6 +22,7 @@ public:
 Q_SIGNALS:
     void closed();
     void responseRecieved();
+    void connectionUnstable();
 
 private Q_SLOTS:
     void onConnected();
@@ -33,6 +34,7 @@ private:
     bool m_debug;
 
     std::optional<QJsonObject> responseObj;
+    void onWebcocketStateChanged();
 
 public:
     bool sendMessage(QString text, QString chatId);

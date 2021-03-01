@@ -8,12 +8,20 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->stackedWidget->setCurrentIndex(0);
     ui->errorLogin->hide();
     ui->errorRegister->hide();
+    ui->labelUnstableConnection->hide();
     client.connectServer();
     ui->inputPassword->setEchoMode(QLineEdit::Password);
+
+    connect(&client, &Client::connectionUnstable, this,
+            &MainWindow::onConnectionUnstable);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
+}
+
+void MainWindow::onConnectionUnstable() {
+    ui->labelUnstableConnection->show();
 }
 
 void MainWindow::on_SendButton_clicked() {

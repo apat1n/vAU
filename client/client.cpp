@@ -10,6 +10,8 @@ Client::Client(const QUrl &url, bool debug, QObject *parent)
 
     connect(&m_webSocket, &QWebSocket::connected, this, &Client::onConnected);
     connect(&m_webSocket, &QWebSocket::disconnected, this, &Client::closed);
+    connect(&m_webSocket, &QWebSocket::stateChanged, this,
+            &Client::onWebcocketStateChanged);
 }
 
 void Client::connectServer() {
@@ -64,6 +66,13 @@ void Client::onBinaryMessageReceived(QByteArray message) {
     qDebug() << message;
     responseObj = QJsonDocument::fromJson(message).object();
     emit responseRecieved();
+}
+
+void Client::onWebcocketStateChanged() {
+    // if connection unstable
+    if (m_webSocket.state() != QAbstractSocket::SocketState::ConnectedState) {
+        emit connectionUnstable();
+    }
 }
 
 void Client::waitResponse() {
