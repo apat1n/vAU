@@ -16,25 +16,6 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::updateDebugText(const QString &message) {
-    QString debugPlainText = ui->debugText->toPlainText();
-    ui->debugText->setText(debugPlainText + message + "\n");
-}
-
-void MainWindow::on_connectButton_clicked() {
-    client.connectServer();
-    updateDebugText("CONNECTED");
-}
-
-void MainWindow::on_DisconnectButton_clicked() {
-    client.disconnectServer();
-    updateDebugText("DISCONNECTED");
-}
-
-void MainWindow::on_StateButton_clicked() {
-    updateDebugText(client.getState());
-}
-
 void MainWindow::on_SendButton_clicked() {
     if (!ui->inputText->document()->isEmpty()) {
         QString inputText = ui->inputText->toPlainText();
@@ -54,6 +35,12 @@ void MainWindow::on_signIn_clicked() {
         ui->errorLogin->show();
     }
     ui->inputPassword->clear();
+}
+
+void MainWindow::on_signOut_clicked() {
+    if (client.logoutUser()){
+        ui->stackedWidget->setCurrentIndex(0);
+    }
 }
 
 void MainWindow::on_registerButton_clicked() {

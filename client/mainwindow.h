@@ -20,12 +20,6 @@ public:
 
 private slots:
 
-    void on_connectButton_clicked();
-
-    void on_DisconnectButton_clicked();
-
-    void on_StateButton_clicked();
-
     void on_SendButton_clicked();
 
     void on_signIn_clicked();
@@ -34,6 +28,7 @@ private slots:
 
     void on_registerButton_clicked();
 
+    void on_signOut_clicked();
 private:
     Ui::MainWindow *ui;
     Client client;
