@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include "client.h"
+#include "message.h"
+#include "chat.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -32,8 +34,17 @@ private slots:
 
     void on_signOut_clicked();
 
+    void on_messageTextField_returnPressed();
+
+    void on_search_textEdited(const QString &searchRequest);
+
 private:
     void onConnectionUnstable();
+
+    void renderChats(const QList<Chat*>&);
+    void renderMessages(Chat*);
+
+    QList<Chat*> availableChats;
 
     Ui::MainWindow *ui;
     Client client;

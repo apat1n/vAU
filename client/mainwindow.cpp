@@ -14,6 +14,9 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
 
     connect(&client, &Client::connectionUnstable, this,
             &MainWindow::onConnectionUnstable);
+
+    availableChats.append(new Chat(0, "Artificial chat"));
+    renderChats(availableChats);
 }
 
 MainWindow::~MainWindow() {
@@ -37,7 +40,7 @@ void MainWindow::on_signIn_clicked() {
     QString password = ui->inputPassword->text();
 
     if (client.loginUser(login, password)) {
-        ui->stackedWidget->setCurrentIndex(1);
+        ui->stackedWidget->setCurrentIndex(2);
         ui->errorLogin->hide();
     } else {
         ui->errorLogin->show();
@@ -65,4 +68,55 @@ void MainWindow::on_registerButton_clicked() {
 
 void MainWindow::on_pushButton_2_clicked() {
     ui->stackedWidget->setCurrentIndex(0);
+}
+
+void MainWindow::on_messageTextField_returnPressed()
+{
+    QString messageText = ui->messageTextField->text();
+    if (!messageText.isEmpty()) {
+        client.sendMessage(messageText);
+        // if ok
+        QListWidgetItem *item = new Message(messageText, "Me");
+        item->setText(messageText);
+        ui->chatView->addItem(item);
+
+        ui->messageTextField->clear();
+    }
+}
+
+void MainWindow::on_search_textEdited(const QString &searchRequest)
+{
+//    if (!searchRequest.isEmpty()){
+//        // some actions with database
+//        qDebug("before search");
+//        QList<QListWidgetItem*> results = availableChats.findItems(searchRequest, Qt::MatchStartsWith);
+//        qDebug("after search");
+//        ui->chatMenu->clear();
+//        for (auto it: results) {
+//            ui->chatMenu->addItem(it);
+//        }
+
+//    }
+//    else {
+//        renderChats(availableChats);
+//    }
+}
+
+void MainWindow::renderChats(const QList<Chat*>& chatsList) {
+    ui->chatMenu->clear();
+    ui->chatMenu->addItem("Create new chat");
+    for (auto it: chatsList) {
+        QListWidgetItem *item = it;
+        item->setText(it->getInterlocutor());
+        ui->chatMenu->addItem(it);
+    }
+}
+
+void MainWindow::renderMessages(Chat* chat) {
+    ui->chatView->clear();
+    for (auto it: chat->getHistory()) {
+        QListWidgetItem *item = it;
+        item->setText(it->getText());
+        ui->chatView->addItem(item);
+    }
 }
