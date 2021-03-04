@@ -234,6 +234,7 @@ void Server::processGetChatListRequest(QJsonObject requestBody,
     response["message"] = "";
     response["content"] = QJsonArray();
 
+    // TODO: send chat list
     User user = authenticatedUsers[pSender];
     for (auto chat : getChatList(user)) {
     }
@@ -286,11 +287,11 @@ void Server::processCreateChatRequest(QJsonObject requestBody,
     QJsonObject response;
     response["method"] = requestBody.value("method").toString();
     response["message"] = "";
-    response["content"] = QJsonArray();
 
-    // TODO: send chat list
-    User user = authenticatedUsers[pSender];
-    for (auto chat : getChatList(user)) {
+    if (createChat(name)) {
+        response["status"] = 200;
+    } else {
+        response["status"] = 401;
     }
 
     QJsonObject responseObj;
@@ -325,6 +326,7 @@ void Server::processSendMessageRequest(QJsonObject requestBody,
         QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
         return;
     }
+    // if user in chat
 
     QJsonObject requestMessage = requestBody.value("message").toObject();
     QString name = requestMessage.value("name").toString();

@@ -1,15 +1,20 @@
 #include "chat.h"
 
-Chat::Chat(int chatId, const QString& interlocutor): chatId(chatId), interlocutor(interlocutor){}
+Chat::Chat(int chatId, const QString name_) : chatId(chatId), name(name_) {
+}
 
-QList<Message*> Chat::getHistory() const {
+[[nodiscard]] QList<Message *> Chat::getHistory() const {
     return message_history;
 }
 
-QString Chat::getInterlocutor() const {
-    return interlocutor;
+[[nodiscard]] QString Chat::getName() const {
+    return name;
 }
 
-void Chat::addMessage(Message* message) {
+[[nodiscard]] int Chat::getChatId() const {
+    return chatId;
+}
+
+void Chat::addMessage(Message *message) {
     message_history.append(message);
 }

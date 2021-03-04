@@ -86,8 +86,20 @@ void Client::waitResponse() {
 }
 
 void Client::sendRequest(const QJsonObject &requestObj) {
-    if (m_webSocket.state() != QAbstractSocket::SocketState::ConnectedState) {
+    while (m_webSocket.state() !=
+           QAbstractSocket::SocketState::ConnectedState) {
         connectServer();
+        if (m_webSocket.state() !=
+            QAbstractSocket::SocketState::ConnectedState) {
+            QTimer timer;
+            timer.setSingleShot(true);
+            QEventLoop loop;
+            connect(&m_webSocket, &QWebSocket::connected, &loop,
+                    &QEventLoop::quit);
+            connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+            timer.start(1000);  // wait for 1s to connect server
+            loop.exec();
+        }
     }
 
     QByteArray requestBinaryMessage = QJsonDocument(requestObj).toJson();

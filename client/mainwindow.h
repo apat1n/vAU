@@ -2,9 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "chat.h"
 #include "client.h"
 #include "message.h"
-#include "chat.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -38,13 +38,15 @@ private slots:
 
     void on_search_textEdited(const QString &searchRequest);
 
+    void on_chatMenu_itemClicked(QListWidgetItem *item);
+
 private:
     void onConnectionUnstable();
 
-    void renderChats(const QList<Chat*>&);
-    void renderMessages(Chat*);
+    void renderChats(const QList<Chat *> &);
+    void renderMessages(Chat *);
 
-    QList<Chat*> availableChats;
+    QList<Chat *> availableChats;
 
     Ui::MainWindow *ui;
     Client client;

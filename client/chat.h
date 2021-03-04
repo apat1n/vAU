@@ -4,17 +4,20 @@
 #include <QListWidgetItem>
 #include "message.h"
 
-class Chat : public QListWidgetItem  {
+class Chat : public QListWidgetItem {
 private:
     int chatId = 0;
-    QString interlocutor;
-    QList<Message*> message_history;
+    QString name;
+    QList<QString> users;
+    QList<Message *> message_history;
+
 public:
-    Chat(int, const QString&);
-    [[nodiscard]]QList<Message*> getHistory() const;
-    [[nodiscard]]QString getInterlocutor() const;
-    void addMessage(Message*);
+    Chat(int, const QString);
+    [[nodiscard]] QList<Message *> getHistory() const;
+    [[nodiscard]] QString getName() const;
+    [[nodiscard]] int getChatId() const;
+    void addMessage(Message *);
     // void updateHistory();
 };
 
-#endif // CHAT_H
+#endif  // CHAT_H

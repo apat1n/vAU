@@ -3,15 +3,15 @@
 
 #include <QListWidgetItem>
 
-class Message: public QListWidgetItem {
+class Message : public QListWidgetItem {
 private:
     QString textMessage;
     QString author;
 
 public:
-    Message(const QString&, const QString&);
+    Message(const QString &, const QString &);
     [[nodiscard]] QString getText() const;
     [[nodiscard]] QString getAuthor() const;
 };
 
-#endif // MESSAGE_H
+#endif  // MESSAGE_H

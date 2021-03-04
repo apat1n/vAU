@@ -1,6 +1,7 @@
 #include "message.h"
 
-Message::Message(const QString &textMessage, const QString &author): textMessage(textMessage), author(author) {
+Message::Message(const QString &textMessage, const QString &author)
+    : textMessage(textMessage), author(author) {
 }
 
 QString Message::getText() const {
