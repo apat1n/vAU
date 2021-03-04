@@ -17,6 +17,8 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
 
     availableChats.append(new Chat(-1, "Create new chat"));
     availableChats.append(new Chat(0, "Artificial chat"));
+    availableChats.append(new Chat(1, "Artificial chat 2"));
+
     renderChats(availableChats);
 }
 
@@ -76,8 +78,14 @@ void MainWindow::on_messageTextField_returnPressed() {
     if (!messageText.isEmpty()) {
         client.sendMessage(messageText);
         // if ok
-        QListWidgetItem *item = new Message(messageText, "Me");
+        Message *message = new Message(messageText, "Me"); // TODO: rework
+        QListWidgetItem *item = message;
         item->setText(messageText);
+
+        if (Chat *chat = dynamic_cast<Chat *>(ui->chatMenu->currentItem()); chat) {
+            chat->addMessage(message);
+            qDebug() << chat->getHistory().size();
+        }
         ui->chatView->addItem(item);
 
         ui->messageTextField->clear();
@@ -112,19 +120,36 @@ void MainWindow::renderChats(const QList<Chat *> &chatsList) {
 }
 
 void MainWindow::renderMessages(Chat *chat) {
+    qDebug() << "before clear";
     ui->chatView->clear();
+    qDebug() << "after clear";
+    if (!chat) {
+        qDebug() << "nullptr here!";
+        return;
+    }
     for (auto it : chat->getHistory()) {
-        QListWidgetItem *item = it;
-        item->setText(it->getText());
-        ui->chatView->addItem(item);
+        if (it) {
+            QListWidgetItem *item = it;
+            item->setText(it->getText());
+            ui->chatView->addItem(item);
+        }
     }
 }
 
 void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
     Chat *chat = dynamic_cast<Chat *>(item);
-    if (chat->getChatId() == -1) {
-        if (client.createChat("test_chat")) {
-            availableChats.append(new Chat(1, "test_chat"));
+
+    if (chat) {
+        if (chat->getChatId() == -1) {
+            if (client.createChat("test_chat")) {
+                availableChats.append(new Chat(1, "test_chat"));
+            }
+        }
+        else {
+            qDebug() << chat->getHistory().size();
+            renderMessages(chat);
         }
     }
+
+
 }
