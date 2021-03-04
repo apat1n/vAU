@@ -132,7 +132,6 @@ void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
     if (item == createChat) {
         ui->chatView->hide();
         if (client.createChat("test_chat")) {
-            availableChats.append(new Chat(1, "test_chat"));
             updateChats();
         }
     } else {

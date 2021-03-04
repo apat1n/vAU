@@ -47,7 +47,7 @@ private:
     bool authUser(User &, QString);
     bool registerUser(QString, QString);
 
-    bool createChat(QString);
+    bool createChat(QString, int);
     QList<Chat> getChatList(User &);
 
     bool createMesage(int, int, QString, QDate);

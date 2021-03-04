@@ -264,6 +264,7 @@ QList<Chat> Server::getChatList(User &user) {
     ss << "SELECT id, name FROM QChat JOIN QChatUserList ON chat_id = id WHERE "
           "user_id = "
        << user.id << ";";
+    qDebug() << QString::fromStdString(ss.str());
     query.exec(QString::fromStdString(ss.str()));
 
     QList<Chat> result;
@@ -298,7 +299,8 @@ void Server::processCreateChatRequest(QJsonObject requestBody,
     response["method"] = requestBody.value("method").toString();
     response["message"] = "";
 
-    if (createChat(name)) {
+    int user_id = authenticatedUsers[pSender].id;
+    if (createChat(name, user_id)) {
         response["status"] = 200;
     } else {
         response["status"] = 401;
@@ -314,12 +316,22 @@ void Server::processCreateChatRequest(QJsonObject requestBody,
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
 
-bool Server::createChat(QString name) {
+bool Server::createChat(QString name, int user_id) {
     QSqlQuery query(db);
     std::stringstream ss;
-    ss << "INSERT INTO QChat (name) VALUES ('" << name.toStdString() << "');";
+    ss << "INSERT INTO QChat (name, creator_id) VALUES ('" << name.toStdString()
+       << "', " << user_id << ");";
+    qDebug() << QString::fromStdString(ss.str());
 
-    return query.exec(QString::fromStdString(ss.str()));
+    if (query.exec(QString::fromStdString(ss.str()))) {
+        int chat_id = query.lastInsertId().toInt();
+        ss.str("");  // clear query string
+        ss << "INSERT INTO QChatUserList (chat_id, user_id) VALUES (" << chat_id
+           << ", " << user_id << ");";
+        qDebug() << QString::fromStdString(ss.str());
+        return query.exec(QString::fromStdString(ss.str()));
+    }
+    return false;
 }
 
 void Server::processSendMessageRequest(QJsonObject requestBody,
