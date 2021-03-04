@@ -14,7 +14,8 @@ SOURCES += \
     client.cpp \
     main.cpp \
     mainwindow.cpp \
-    message.cpp
+    message.cpp \
+    utils.cpp
 
 HEADERS += \
     chat.h \

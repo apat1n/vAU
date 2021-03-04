@@ -48,6 +48,8 @@ private:
 
     QList<Chat *> availableChats;
 
+    QListWidgetItem *createChat;
+
     Ui::MainWindow *ui;
     Client client;
 };

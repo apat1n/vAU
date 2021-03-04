@@ -1,9 +1,13 @@
 #include "mainwindow.h"
 #include <iostream>
 #include "ui_mainwindow.h"
+#include "utils.cpp"
 
 MainWindow::MainWindow(const QString &server_url, QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), client(server_url) {
+    : QMainWindow(parent),
+      ui(new Ui::MainWindow),
+      client(server_url),
+      createChat(new QListWidgetItem("Create new chat")) {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
     ui->errorLogin->hide();
@@ -15,10 +19,9 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     connect(&client, &Client::connectionUnstable, this,
             &MainWindow::onConnectionUnstable);
 
-    availableChats.append(new Chat(-1, "Create new chat"));
     availableChats.append(new Chat(0, "Artificial chat"));
-    availableChats.append(new Chat(1, "Artificial chat 2"));
-
+    availableChats.append(new Chat(1, "Bartificial chat 2"));
+    ui->chatView->hide();
     renderChats(availableChats);
 }
 
@@ -75,43 +78,37 @@ void MainWindow::on_pushButton_2_clicked() {
 
 void MainWindow::on_messageTextField_returnPressed() {
     QString messageText = ui->messageTextField->text();
-    if (!messageText.isEmpty()) {
-        client.sendMessage(messageText);
-        // if ok
-        Message *message = new Message(messageText, "Me"); // TODO: rework
-        QListWidgetItem *item = message;
-        item->setText(messageText);
 
-        if (Chat *chat = dynamic_cast<Chat *>(ui->chatMenu->currentItem()); chat) {
+    if (!messageText.isEmpty()) {
+        // Creating message
+        Message *message = new Message(messageText, "Me");
+        message->setText(messageText);
+        //
+
+        // Sending to db and adding to listview
+        if (Chat *chat = dynamic_cast<Chat *>(ui->chatMenu->currentItem());
+            chat) {
+            client.sendMessage(messageText);
             chat->addMessage(message);
+            ui->chatView->addItem(dynamic_cast<QListWidgetItem *>(message));
             qDebug() << chat->getHistory().size();
         }
-        ui->chatView->addItem(item);
 
         ui->messageTextField->clear();
     }
 }
 
 void MainWindow::on_search_textEdited(const QString &searchRequest) {
-    //    if (!searchRequest.isEmpty()){
-    //        // some actions with database
-    //        qDebug("before search");
-    //        QList<QListWidgetItem*> results =
-    //        availableChats.findItems(searchRequest, Qt::MatchStartsWith);
-    //        qDebug("after search");
-    //        ui->chatMenu->clear();
-    //        for (auto it: results) {
-    //            ui->chatMenu->addItem(it);
-    //        }
-
-    //    }
-    //    else {
-    //        renderChats(availableChats);
-    //    }
+    if (!searchRequest.isEmpty()) {
+        renderChats(foundMatches(availableChats, searchRequest));
+    } else {
+        renderChats(availableChats);
+    }
 }
 
 void MainWindow::renderChats(const QList<Chat *> &chatsList) {
-    ui->chatMenu->clear();
+    clearListWidget(ui->chatMenu);
+    ui->chatMenu->addItem(createChat);
     for (auto it : chatsList) {
         QListWidgetItem *item = it;
         item->setText(it->getName());
@@ -120,36 +117,29 @@ void MainWindow::renderChats(const QList<Chat *> &chatsList) {
 }
 
 void MainWindow::renderMessages(Chat *chat) {
-    qDebug() << "before clear";
-    ui->chatView->clear();
-    qDebug() << "after clear";
-    if (!chat) {
-        qDebug() << "nullptr here!";
-        return;
-    }
+    clearListWidget(ui->chatView);
     for (auto it : chat->getHistory()) {
         if (it) {
-            QListWidgetItem *item = it;
-            item->setText(it->getText());
-            ui->chatView->addItem(item);
+            if (QListWidgetItem *widgetElem =
+                    dynamic_cast<QListWidgetItem *>(it);
+                widgetElem) {
+                ui->chatView->addItem(widgetElem);
+            }
         }
+        // TODO: try - catch
     }
 }
 
 void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
-    Chat *chat = dynamic_cast<Chat *>(item);
-
-    if (chat) {
-        if (chat->getChatId() == -1) {
-            if (client.createChat("test_chat")) {
-                availableChats.append(new Chat(1, "test_chat"));
-            }
+    if (item == createChat) {
+        if (client.createChat("test_chat")) {
+            availableChats.append(new Chat(1, "test_chat"));
         }
-        else {
-            qDebug() << chat->getHistory().size();
+    } else {
+        Chat *chat = dynamic_cast<Chat *>(item);
+        if (chat) {
+            ui->chatView->show();
             renderMessages(chat);
         }
     }
-
-
 }
