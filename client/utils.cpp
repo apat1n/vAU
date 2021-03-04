@@ -8,7 +8,7 @@
 
 [[nodiscard]] static bool isMatch(const QString &message,
                                   const QString &pattern) {
-    QString s = pattern + message;
+    QString s = pattern + "&" + message;
     qDebug() << s;
     int n = s.size();
 
