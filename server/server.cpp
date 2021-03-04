@@ -231,9 +231,9 @@ void Server::processGetChatListRequest(QJsonObject requestBody,
 
     QJsonObject response;
     response["method"] = requestBody.value("method").toString();
+    response["status"] = 200;
 
     QJsonObject responseMessage;
-    responseMessage["content"] = QJsonArray();
 
     QJsonArray contentArray;
     User user = authenticatedUsers[pSender];
@@ -241,7 +241,7 @@ void Server::processGetChatListRequest(QJsonObject requestBody,
         QJsonObject chatItem;
         chatItem["id"] = chat.id;
         chatItem["name"] = chat.name;
-//        chatItem["lastUpdated"] = chat.lastUpdated.toString();
+        //        chatItem["lastUpdated"] = chat.lastUpdated.toString();
         contentArray.append(chatItem);
     }
 
@@ -270,7 +270,7 @@ QList<Chat> Server::getChatList(User &user) {
     while (query.next()) {
         int id = query.value(0).toInt();
         QString name = query.value(1).toString();
-//        QDate lastUpdated = query.value(2).toDate();
+        //        QDate lastUpdated = query.value(2).toDate();
         result.append(Chat{id, name, QDate()});
     }
     return result;

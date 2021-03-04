@@ -2,6 +2,7 @@
 #define MESSAGE_H
 
 #include <QListWidgetItem>
+#include <QString>
 
 class Message : public QListWidgetItem {
 private:

@@ -1,7 +1,9 @@
 #ifndef CHAT_H
 #define CHAT_H
 
+#include <QList>
 #include <QListWidgetItem>
+#include <QString>
 #include "message.h"
 
 class Chat : public QListWidgetItem {

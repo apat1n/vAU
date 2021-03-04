@@ -1,6 +1,7 @@
 #ifndef ECHOCLIENT_H
 #define ECHOCLIENT_H
 
+#include <chat.h>
 #include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -41,7 +42,8 @@ public:
     bool logoutUser();
     QJsonArray searchMessage(QString message, QString chatId);
     bool createChat(QString name);
-    bool getChatList();
+    bool getChatList(QList<Chat *> &chatList);
+    // bool getMessageHistory(int chatId);
     void waitResponse();
     void sendRequest(const QJsonObject &requestObj);
     bool loginUser(QString login, QString password);

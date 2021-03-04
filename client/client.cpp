@@ -2,6 +2,8 @@
 
 QT_USE_NAMESPACE
 
+#include <QJsonArray>
+
 Client::Client(const QUrl &url, bool debug, QObject *parent)
     : QObject(parent), m_url(url), m_debug(debug) {
     if (m_debug) {
@@ -158,7 +160,7 @@ bool Client::createChat(QString name) {
     return method == request["method"].toString() && status == 200;
 }
 
-bool Client::getChatList() {
+bool Client::getChatList(QList<Chat *> &chatList) {
     QJsonObject message;
 
     QJsonObject request;
@@ -178,8 +180,22 @@ bool Client::getChatList() {
     int status = responseBody.value("status").toInt();
     responseObj.reset();
 
+    if (method == request["method"].toString() && status == 200) {
+        QJsonArray responseArray =
+            responseBody.value("message").toObject().value("content").toArray();
+        for (auto chatData : responseArray) {
+            int id = chatData.toObject().value("id").toInt();
+            QString name = chatData.toObject().value("name").toString();
+            chatList.append(new Chat(id, name));
+        }
+    }
+
     return method == request["method"].toString() && status == 200;
 }
+
+// bool getMessageHistory(int chatId){
+
+//}
 
 bool Client::logoutUser() {
     QJsonObject request;
@@ -223,9 +239,6 @@ bool Client::loginUser(QString login, QString password) {
     QString method = responseBody.value("method").toString();
     int status = responseBody.value("status").toInt();
     responseObj.reset();
-
-    getChatList();
-
     return method == request["method"].toString() && status == 200;
 }
 

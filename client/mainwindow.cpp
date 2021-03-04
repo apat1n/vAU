@@ -18,11 +18,7 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
 
     connect(&client, &Client::connectionUnstable, this,
             &MainWindow::onConnectionUnstable);
-
-    availableChats.append(new Chat(0, "Artificial chat"));
-    availableChats.append(new Chat(1, "Bartificial chat 2"));
     ui->chatView->hide();
-    renderChats(availableChats);
 }
 
 MainWindow::~MainWindow() {
@@ -47,6 +43,7 @@ void MainWindow::on_signIn_clicked() {
 
     if (client.loginUser(login, password)) {
         ui->stackedWidget->setCurrentIndex(2);
+        updateChats();
         ui->errorLogin->hide();
     } else {
         ui->errorLogin->show();
@@ -66,6 +63,7 @@ void MainWindow::on_registerButton_clicked() {
 
     if (client.registerUser(login, password)) {
         ui->stackedWidget->setCurrentIndex(1);
+        updateChats();
         ui->errorRegister->hide();
     } else {
         ui->errorRegister->show();
@@ -132,8 +130,10 @@ void MainWindow::renderMessages(Chat *chat) {
 
 void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
     if (item == createChat) {
+        ui->chatView->hide();
         if (client.createChat("test_chat")) {
             availableChats.append(new Chat(1, "test_chat"));
+            updateChats();
         }
     } else {
         Chat *chat = dynamic_cast<Chat *>(item);
@@ -142,4 +142,14 @@ void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
             renderMessages(chat);
         }
     }
+}
+
+void MainWindow::updateChats() {
+    QList<Chat *> newAvailableChats;
+    if (client.getChatList(newAvailableChats)) {
+        clearListWidget(ui->chatMenu);
+        availableChats.clear();
+        std::swap(newAvailableChats, availableChats);
+    }
+    renderChats(availableChats);
 }

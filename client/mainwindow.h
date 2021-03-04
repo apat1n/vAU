@@ -42,7 +42,7 @@ private slots:
 
 private:
     void onConnectionUnstable();
-
+    void updateChats();
     void renderChats(const QList<Chat *> &);
     void renderMessages(Chat *);
 
