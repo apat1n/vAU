@@ -41,6 +41,7 @@ public:
     bool logoutUser();
     QJsonArray searchMessage(QString message, QString chatId);
     bool createChat(QString name);
+    bool getChatList();
     void waitResponse();
     void sendRequest(const QJsonObject &requestObj);
     bool loginUser(QString login, QString password);

@@ -231,13 +231,22 @@ void Server::processGetChatListRequest(QJsonObject requestBody,
 
     QJsonObject response;
     response["method"] = requestBody.value("method").toString();
-    response["message"] = "";
-    response["content"] = QJsonArray();
 
-    // TODO: send chat list
+    QJsonObject responseMessage;
+    responseMessage["content"] = QJsonArray();
+
+    QJsonArray contentArray;
     User user = authenticatedUsers[pSender];
     for (auto chat : getChatList(user)) {
+        QJsonObject chatItem;
+        chatItem["id"] = chat.id;
+        chatItem["name"] = chat.name;
+//        chatItem["lastUpdated"] = chat.lastUpdated.toString();
+        contentArray.append(chatItem);
     }
+
+    responseMessage["content"] = contentArray;
+    response["message"] = responseMessage;
 
     QJsonObject responseObj;
     responseObj["response"] = response;
@@ -255,13 +264,14 @@ QList<Chat> Server::getChatList(User &user) {
     ss << "SELECT id, name FROM QChat JOIN QChatUserList ON chat_id = id WHERE "
           "user_id = "
        << user.id << ";";
+    query.exec(QString::fromStdString(ss.str()));
 
     QList<Chat> result;
     while (query.next()) {
         int id = query.value(0).toInt();
         QString name = query.value(1).toString();
-        QDate lastUpdated = query.value(2).toDate();
-        result << Chat{id, name, lastUpdated};
+//        QDate lastUpdated = query.value(2).toDate();
+        result.append(Chat{id, name, QDate()});
     }
     return result;
 }

@@ -123,6 +123,8 @@ void MainWindow::renderMessages(Chat *chat) {
 void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
     Chat *chat = dynamic_cast<Chat *>(item);
     if (chat->getChatId() == -1) {
-        client.createChat("test_chat");
+        if (client.createChat("test_chat")) {
+            availableChats.append(new Chat(1, "test_chat"));
+        }
     }
 }
