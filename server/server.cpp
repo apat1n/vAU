@@ -39,6 +39,9 @@ Server::Server(quint16 port, bool debug, QObject *parent)
     if (m_debug) {
         qDebug() << "SQL connection: " << (db.open() ? "opened" : "closed");
     }
+
+    // set English localization for dates
+    QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
 }
 
 Server::~Server() {
@@ -444,8 +447,8 @@ bool Server::createMessage(int chat_id,
     std::stringstream ss;
     ss << "INSERT INTO QChatMessages (chat_id, user_id, message, message_date) "
        << "VALUES (" << chat_id << ", " << user_id << ", '"
-       << message.toStdString() << "', '" << date.toString().toStdString()
-       << "');";
+       << message.toStdString() << "', '"
+       << date.toString(Qt::DefaultLocaleShortDate).toStdString() << "');";
     qDebug() << QString::fromStdString(ss.str());
     return query.exec(QString::fromStdString(ss.str()));
 }
