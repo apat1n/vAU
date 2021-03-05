@@ -128,17 +128,16 @@ bool Client::sendMessage(Message *messageObj, int chatId) {
     requestObj["request"] = request;
 
     sendRequest(requestObj);
-    return true;
-    //    if (responseObj->empty()) {
-    //        return false;
-    //    }
+    if (responseObj->empty()) {
+        return false;
+    }
 
-    //    QJsonObject responseBody = responseObj->value("response").toObject();
-    //    QString method = responseBody.value("method").toString();
-    //    int status = responseBody.value("status").toInt();
-    //    responseObj.reset();
-    //    qDebug() << "response was got";
-    //    return method == request["method"].toString() && status == 200;
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
+    responseObj.reset();
+    qDebug() << "response was got";
+    return method == request["method"].toString() && status == 200;
 }
 
 bool Client::createChat(QString name) {

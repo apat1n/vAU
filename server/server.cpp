@@ -436,7 +436,24 @@ void Server::processSendMessageRequest(QJsonObject requestBody,
     QString text_message = requestMessage.value("content").toString();
     QDate date = QDate::currentDate();
 
-    createMessage(chat_id, user_id, text_message, date);
+    QJsonObject response;
+    response["method"] = requestBody.value("method").toString();
+    response["message"] = "";
+
+    if (createMessage(chat_id, user_id, text_message, date)) {
+        response["status"] = 200;
+    } else {
+        response["status"] = 401;
+    }
+
+    QJsonObject responseObj;
+    responseObj["response"] = response;
+
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
 }
 
 bool Server::createMessage(int chat_id,
