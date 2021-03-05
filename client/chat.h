@@ -18,6 +18,7 @@ public:
     [[nodiscard]] QList<Message *> getHistory() const;
     [[nodiscard]] QString getName() const;
     [[nodiscard]] int getChatId() const;
+    void updateMessageHistory(QList<Message *> &&);
     void addMessage(Message *);
     // void updateHistory();
 };

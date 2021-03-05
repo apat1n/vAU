@@ -50,7 +50,7 @@ private:
 
     bool createChat(QString, int);
     QList<Chat> getChatList(User &);
-    QList<Message> getMessageList(User &, int chatId);
+    QList<Message> getMessageList(int chatId);
 
     bool createMessage(int, int, QString, QDate);
 };

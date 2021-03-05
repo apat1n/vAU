@@ -18,3 +18,8 @@ Chat::Chat(int chatId, const QString name_) : chatId(chatId), name(name_) {
 void Chat::addMessage(Message *message) {
     message_history.append(message);
 }
+
+void Chat::updateMessageHistory(QList<Message *> &&newHistory) {
+    message_history.clear();
+    std::swap(newHistory, message_history);
+}

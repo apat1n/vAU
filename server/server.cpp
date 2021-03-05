@@ -117,6 +117,8 @@ void Server::processLoginRequest(QJsonObject requestBody, QWebSocket *pSender) {
         response["status"] = 401;
     }
 
+    response["id"] = user.id;
+
     QJsonObject responseObj;
     responseObj["response"] = response;
 
@@ -178,6 +180,7 @@ void Server::processRegisterRequest(QJsonObject requestBody,
     if (response["status"] == 200) {
         User user = User({-1, login, pSender});
         authUser(user, password);
+        response["id"] = user.id;
         authenticatedUsers[pSender] = user;
     }
 }
@@ -306,10 +309,10 @@ void Server::proccessChatGetMessages(QJsonObject requestBody,
     QJsonObject responseMessage;
 
     QJsonArray contentArray;
-    User user = authenticatedUsers[pSender];
-    for (auto message_it : getMessageList(user, chatId)) {
+
+    for (auto message_it : getMessageList(chatId)) {
         QJsonObject chatItem;
-        chatItem["id"] = message_it.id;
+        chatItem["id"] = message_it.user_id;
         chatItem["message_text"] = message_it.message;
         //        chatItem["lastUpdated"] = chat.lastUpdated.toString();
         contentArray.append(chatItem);
@@ -328,13 +331,12 @@ void Server::proccessChatGetMessages(QJsonObject requestBody,
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
 
-QList<Message> Server::getMessageList(User &user, int chatId) {
+QList<Message> Server::getMessageList(int chatId) {
     QSqlQuery query(db);
     std::stringstream ss;
-    ss << "SELECT id, message, message_date FROM QChatMessages WHERE "
+    ss << "SELECT id, user_id, message, message_date FROM QChatMessages WHERE "
           "chat_id = "
-       << chatId << " AND "
-       << "user_id = " << user.id << ";";
+       << chatId << ";";
 
     qDebug() << QString::fromStdString(ss.str());
     query.exec(QString::fromStdString(ss.str()));
@@ -342,9 +344,10 @@ QList<Message> Server::getMessageList(User &user, int chatId) {
     QList<Message> result;
     while (query.next()) {
         int id = query.value(0).toInt();
-        QString message = query.value(1).toString();
-        //        QDate lastUpdated = query.value(2).toDate();
-        result.append(Message{id, message, QDate()});
+        int user_id = query.value(1).toInt();
+        QString message = query.value(2).toString();
+        //        QDate lastUpdated = query.value(3).toDate();
+        result.append(Message{id, user_id, message, QDate()});
     }
     return result;
 }
@@ -440,9 +443,9 @@ bool Server::createMessage(int chat_id,
     QSqlQuery query(db);
     std::stringstream ss;
     ss << "INSERT INTO QChatMessages (chat_id, user_id, message, message_date) "
-       << "VALUES ('" << chat_id << ", " << user_id << ", "
-       << message.toStdString() << ", " << date.toString().toStdString()
+       << "VALUES (" << chat_id << ", " << user_id << ", '"
+       << message.toStdString() << "', '" << date.toString().toStdString()
        << "');";
-
+    qDebug() << QString::fromStdString(ss.str());
     return query.exec(QString::fromStdString(ss.str()));
 }

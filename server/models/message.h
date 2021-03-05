@@ -6,6 +6,7 @@
 
 struct Message {
     int id;
+    int user_id;
     QString message;
     QDate lastUpdated;
 };

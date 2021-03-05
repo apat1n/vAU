@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <iostream>
+#include <utility>
 #include "ui_mainwindow.h"
 #include "utils.cpp"
 
@@ -32,7 +33,7 @@ void MainWindow::onConnectionUnstable() {
 void MainWindow::on_SendButton_clicked() {
     if (!ui->inputText->document()->isEmpty()) {
         QString inputText = ui->inputText->toPlainText();
-        client.sendMessage(inputText);
+        // client.sendMessage(inputText);
         ui->inputText->clear();
     }
 }
@@ -79,19 +80,18 @@ void MainWindow::on_messageTextField_returnPressed() {
 
     if (!messageText.isEmpty()) {
         // Creating message
-        Message *message = new Message(messageText, "Me");
+        Message *message = new Message(messageText, client.getId());
         message->setText(messageText);
         //
 
         // Sending to db and adding to listview
         if (Chat *chat = dynamic_cast<Chat *>(ui->chatMenu->currentItem());
             chat) {
-            client.sendMessage(messageText);
-            chat->addMessage(message);
-            ui->chatView->addItem(dynamic_cast<QListWidgetItem *>(message));
-            qDebug() << chat->getHistory().size();
+            if (client.sendMessage(message, chat->getChatId())) {
+                qDebug() << "Successfully sent!";
+                renderMessages(chat);
+            }
         }
-
         ui->messageTextField->clear();
     }
 }
@@ -116,17 +116,22 @@ void MainWindow::renderChats(const QList<Chat *> &chatsList) {
 
 void MainWindow::renderMessages(Chat *chat) {
     QList<Message *> newHistory;
-    clearListWidget(ui->chatView);
-    client.getChatMessages(chat->getChatId(), newHistory);
-    for (auto it : chat->getHistory()) {
-        if (it) {
-            if (QListWidgetItem *widgetElem =
-                    dynamic_cast<QListWidgetItem *>(it);
-                widgetElem) {
-                ui->chatView->addItem(widgetElem);
+    if (client.getChatMessages(chat->getChatId(), newHistory)) {
+        clearListWidget(ui->chatView);
+        chat->updateMessageHistory(std::move(newHistory));
+        qDebug() << "Got " << chat->getHistory().size() << " messages!";
+        for (auto it : chat->getHistory()) {
+            if (it) {
+                qDebug() << it->getText();
+                if (QListWidgetItem *widgetElem =
+                        dynamic_cast<QListWidgetItem *>(it);
+                    widgetElem) {
+                    widgetElem->setText(it->getText());
+                    ui->chatView->addItem(widgetElem);
+                }
             }
+            // TODO: try - catch
         }
-        // TODO: try - catch
     }
 }
 

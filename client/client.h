@@ -17,7 +17,7 @@ public:
     explicit Client(const QUrl &, bool = true, QObject * = nullptr);
     void connectServer();
     void disconnectServer();
-    void sendMessage(const QString &);
+    // void sendMessage(const QString &);
     QString getState() const;
 
 Q_SIGNALS:
@@ -36,11 +36,13 @@ private:
 
     std::optional<QJsonObject> responseObj;
     void onWebcocketStateChanged();
+    int currId = 0;
 
 public:
-    bool sendMessage(QString text, QString chatId);
+    int getId() const;
+    bool sendMessage(Message *, int);
     bool logoutUser();
-    QJsonArray searchMessage(QString message, QString chatId);
+    // QJsonArray searchMessage(QString message, QString chatId);
     bool createChat(QString name);
     bool getChatList(QList<Chat *> &chatList);
     bool getChatMessages(int chatId, QList<Message *> &messageHistory);
