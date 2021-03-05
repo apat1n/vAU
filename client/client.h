@@ -43,7 +43,7 @@ public:
     QJsonArray searchMessage(QString message, QString chatId);
     bool createChat(QString name);
     bool getChatList(QList<Chat *> &chatList);
-    // bool getMessageHistory(int chatId);
+    bool getChatMessages(int chatId, QList<Message *> &messageHistory);
     void waitResponse();
     void sendRequest(const QJsonObject &requestObj);
     bool loginUser(QString login, QString password);

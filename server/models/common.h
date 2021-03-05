@@ -5,4 +5,6 @@ struct User;
 
 struct Chat;
 
+struct Message;
+
 #endif  // COMMON_H

@@ -193,9 +193,43 @@ bool Client::getChatList(QList<Chat *> &chatList) {
     return method == request["method"].toString() && status == 200;
 }
 
-// bool getMessageHistory(int chatId){
+bool Client::getChatMessages(int chatId, QList<Message *> &messageHistory) {
+    QJsonObject content;
+    content["chat_id"] = chatId;
 
-//}
+    QJsonObject message;
+    message["content"] = content;
+
+    QJsonObject request;
+    request["method"] = "getChatMessages";
+    request["message"] = message;
+
+    QJsonObject requestObj;
+    requestObj["request"] = request;
+
+    sendRequest(requestObj);
+    if (responseObj->empty()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
+    responseObj.reset();
+
+    if (method == request["method"].toString() && status == 200) {
+        QJsonArray responseArray =
+            responseBody.value("message").toObject().value("content").toArray();
+        for (auto responseMessage : responseArray) {
+            // TODO
+            QString messageText =
+                responseMessage.toObject().value("message_text").toString();
+            qDebug() << messageText;
+        }
+    }
+
+    return method == request["method"].toString() && status == 200;
+}
 
 bool Client::logoutUser() {
     QJsonObject request;

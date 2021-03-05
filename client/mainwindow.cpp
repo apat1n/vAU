@@ -115,7 +115,9 @@ void MainWindow::renderChats(const QList<Chat *> &chatsList) {
 }
 
 void MainWindow::renderMessages(Chat *chat) {
+    QList<Message *> newHistory;
     clearListWidget(ui->chatView);
+    client.getChatMessages(chat->getChatId(), newHistory);
     for (auto it : chat->getHistory()) {
         if (it) {
             if (QListWidgetItem *widgetElem =

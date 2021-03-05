@@ -8,6 +8,7 @@
 #include <QtCore/QList>
 #include <QtCore/QObject>
 #include "models/chat.h"
+#include "models/message.h"
 #include "models/user.h"
 
 QT_FORWARD_DECLARE_CLASS(QWebSocketServer)
@@ -41,7 +42,7 @@ private:
     void processLogoutRequest(QJsonObject, QWebSocket *);
     void processGetChatListRequest(QJsonObject, QWebSocket *);
     void processCreateChatRequest(QJsonObject, QWebSocket *);
-    //    void proccessChatGetMessages(QJsonObject, QWebSocket *);
+    void proccessChatGetMessages(QJsonObject, QWebSocket *);
     void processSendMessageRequest(QJsonObject, QWebSocket *);
 
     bool authUser(User &, QString);
@@ -49,8 +50,9 @@ private:
 
     bool createChat(QString, int);
     QList<Chat> getChatList(User &);
+    QList<Message> getMessageList(User &, int chatId);
 
-    bool createMesage(int, int, QString, QDate);
+    bool createMessage(int, int, QString, QDate);
 };
 
 #endif  // SERVER_H

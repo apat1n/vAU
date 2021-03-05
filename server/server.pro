@@ -15,6 +15,7 @@ SOURCES += \
     server.cpp
 
 HEADERS += \
+    models/message.h \
     server.h \
     models/common.h \
     models/user.h \

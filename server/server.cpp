@@ -83,6 +83,8 @@ void Server::processBinaryMessage(QByteArray message) {
         processCreateChatRequest(requestBody, pSender);
     } else if (requestMethod == "sendMessage") {
         processSendMessageRequest(requestBody, pSender);
+    } else if (requestMethod == "getChatMessages") {
+        proccessChatGetMessages(requestBody, pSender);
     }
 }
 
@@ -228,7 +230,6 @@ void Server::processGetChatListRequest(QJsonObject requestBody,
     QJsonObject requestMessage = requestBody.value("message").toObject();
     QString login = requestMessage.value("login").toString();
     QString password = requestMessage.value("password").toString();
-
     QJsonObject response;
     response["method"] = requestBody.value("method").toString();
     response["status"] = 200;
@@ -273,6 +274,77 @@ QList<Chat> Server::getChatList(User &user) {
         QString name = query.value(1).toString();
         //        QDate lastUpdated = query.value(2).toDate();
         result.append(Chat{id, name, QDate()});
+    }
+    return result;
+}
+
+void Server::proccessChatGetMessages(QJsonObject requestBody,
+                                     QWebSocket *pSender) {
+    if (!authenticatedUsers.contains(pSender)) {
+        QJsonObject response;
+        response["method"] = requestBody.value("method").toString();
+        response["message"] = "";
+        response["status"] = 403;
+
+        QJsonObject responseObj;
+        responseObj["response"] = response;
+
+        QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+        return;
+    }
+    QJsonObject requestMessage = requestBody.value("message").toObject();
+    QString login = requestMessage.value("login").toString();
+    QString password = requestMessage.value("password").toString();
+
+    int chatId =
+        requestMessage.value("content").toObject().value("chat_id").toInt();
+
+    QJsonObject response;
+    response["method"] = requestBody.value("method").toString();
+    response["status"] = 200;
+
+    QJsonObject responseMessage;
+
+    QJsonArray contentArray;
+    User user = authenticatedUsers[pSender];
+    for (auto message_it : getMessageList(user, chatId)) {
+        QJsonObject chatItem;
+        chatItem["id"] = message_it.id;
+        chatItem["message_text"] = message_it.message;
+        //        chatItem["lastUpdated"] = chat.lastUpdated.toString();
+        contentArray.append(chatItem);
+    }
+
+    responseMessage["content"] = contentArray;
+    response["message"] = responseMessage;
+
+    QJsonObject responseObj;
+    responseObj["response"] = response;
+
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
+QList<Message> Server::getMessageList(User &user, int chatId) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+    ss << "SELECT id, message, message_date FROM QChatMessages WHERE "
+          "chat_id = "
+       << chatId << " AND "
+       << "user_id = " << user.id << ";";
+
+    qDebug() << QString::fromStdString(ss.str());
+    query.exec(QString::fromStdString(ss.str()));
+
+    QList<Message> result;
+    while (query.next()) {
+        int id = query.value(0).toInt();
+        QString message = query.value(1).toString();
+        //        QDate lastUpdated = query.value(2).toDate();
+        result.append(Message{id, message, QDate()});
     }
     return result;
 }
@@ -358,13 +430,13 @@ void Server::processSendMessageRequest(QJsonObject requestBody,
     QString text_message = requestMessage.value("content").toString();
     QDate date = QDate::currentDate();
 
-    createMesage(chat_id, user_id, text_message, date);
+    createMessage(chat_id, user_id, text_message, date);
 }
 
-bool Server::createMesage(int chat_id,
-                          int user_id,
-                          QString message,
-                          QDate date) {
+bool Server::createMessage(int chat_id,
+                           int user_id,
+                           QString message,
+                           QDate date) {
     QSqlQuery query(db);
     std::stringstream ss;
     ss << "INSERT INTO QChatMessages (chat_id, user_id, message, message_date) "
