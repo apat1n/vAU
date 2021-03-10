@@ -1,4 +1,5 @@
-QT       += core gui websockets
+QT += core gui
+QT += websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -9,11 +10,18 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    chat.cpp \
+    client.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    message.cpp \
+    utils.cpp
 
 HEADERS += \
-    mainwindow.h
+    chat.h \
+    client.h \
+    mainwindow.h \
+    message.h
 
 FORMS += \
     mainwindow.ui
