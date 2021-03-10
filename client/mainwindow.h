@@ -46,11 +46,10 @@ private:
     void renderChats(const QList<Chat *> &);
     void renderMessages(Chat *);
 
-    QList<Chat *> availableChats;
-
-    QListWidgetItem *createChat;
-
     Ui::MainWindow *ui;
     Client client;
+
+    QList<Chat *> availableChats;
+    QListWidgetItem *createChat;
 };
 #endif  // MAINWINDOW_H

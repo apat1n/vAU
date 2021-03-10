@@ -24,41 +24,9 @@ void Client::disconnectServer() {
     m_webSocket.close();
 }
 
-// void Client::sendMessage(const QString &message) {
-//    m_webSocket.sendTextMessage(message);
-
-//    QByteArray ba;
-
-//    m_webSocket.sendBinaryMessage(ba);
-//}
-
 int Client::getId() const {
     return currId;
 }
-
-QString Client::getState() const {
-    using SocketState = QAbstractSocket::SocketState;
-    SocketState state = m_webSocket.state();
-    switch (state) {
-        case SocketState::ConnectedState:
-            return "OPEN";
-            break;
-        case SocketState::ConnectingState:
-            return "Connecting";
-            break;
-        case SocketState::ClosingState:
-            return "Closing";
-            break;
-        case SocketState::UnconnectedState:
-            return "Closed";
-            break;
-    }
-    return "Unknown";
-}
-
-// QJsonArray Client::searchMessage(QString message, QString chatId){
-
-//}
 
 void Client::onConnected() {
     if (m_debug) {
