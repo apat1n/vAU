@@ -105,6 +105,7 @@ void MainWindow::on_search_textEdited(const QString &searchRequest) {
 }
 
 void MainWindow::renderChats(const QList<Chat *> &chatsList) {
+    client.getUserList(availibleUsers);
     clearListWidget(ui->chatMenu);
     ui->chatMenu->addItem(createChat);
     for (auto it : chatsList) {
@@ -115,6 +116,7 @@ void MainWindow::renderChats(const QList<Chat *> &chatsList) {
 }
 
 void MainWindow::renderMessages(Chat *chat) {
+    client.getUserList(availibleUsers);
     QList<Message *> newHistory;
     if (client.getChatMessages(chat->getChatId(), newHistory)) {
         clearListWidget(ui->chatView);
@@ -126,7 +128,11 @@ void MainWindow::renderMessages(Chat *chat) {
                 if (QListWidgetItem *widgetElem =
                         dynamic_cast<QListWidgetItem *>(it);
                     widgetElem) {
-                    widgetElem->setText(it->getText());
+                    QString textField = "[ " +
+                                        availibleUsers[it->getAuthorId()] +
+                                        " ] : " + it->getText();
+                    qDebug() << textField;
+                    widgetElem->setText(textField);
                     ui->chatView->addItem(widgetElem);
                 }
             }

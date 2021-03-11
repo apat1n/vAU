@@ -14,6 +14,7 @@ public:
     Message(const QString &, const QString &);
     Message(const QString &, int autorId);
 
+    [[nodiscard]] int getAuthorId() const;
     [[nodiscard]] QString getText() const;
     [[nodiscard]] QString getAuthor() const;
 };

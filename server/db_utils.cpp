@@ -103,3 +103,20 @@ bool Server::createMessage(int chat_id,
     qDebug() << QString::fromStdString(ss.str());
     return query.exec(QString::fromStdString(ss.str()));
 }
+
+QMap<int, QString> Server::getUserList() {
+    QSqlQuery query(db);
+    std::stringstream ss;
+    ss << "SELECT id, login FROM quser;";
+    qDebug() << QString::fromStdString(ss.str());
+    query.exec(QString::fromStdString(ss.str()));
+
+    QMap<int, QString> result;
+    while (query.next()) {
+        int user_id = query.value(0).toInt();
+        QString user_name = query.value(1).toString();
+        result[user_id] = user_name;
+    }
+
+    return result;
+}

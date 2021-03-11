@@ -51,5 +51,6 @@ private:
 
     QList<Chat *> availableChats;
     QListWidgetItem *createChat;
+    QMap<int, QString> availibleUsers;
 };
 #endif  // MAINWINDOW_H

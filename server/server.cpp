@@ -87,6 +87,8 @@ void Server::processBinaryMessage(QByteArray message) {
         processSendMessageRequest(requestBody, pSender);
     } else if (requestMethod == "getChatMessages") {
         proccessChatGetMessages(requestBody, pSender);
+    } else if (requestMethod == "getUserList") {
+        processGetUserList(requestBody, pSender);
     }
 }
 
@@ -355,6 +357,52 @@ void Server::processSendMessageRequest(QJsonObject requestBody,
     } else {
         response["status"] = 401;
     }
+
+    QJsonObject responseObj;
+    responseObj["response"] = response;
+
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
+void Server::processGetUserList(QJsonObject requestBody, QWebSocket *pSender) {
+    if (!authenticatedUsers.contains(pSender)) {
+        QJsonObject response;
+        response["method"] = requestBody.value("method").toString();
+        response["message"] = "";
+        response["status"] = 403;
+
+        QJsonObject responseObj;
+        responseObj["response"] = response;
+
+        QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+        return;
+    }
+    // if user in chat
+
+    QJsonArray contentArray;
+
+    QMap<int, QString> userList = getUserList();
+    QMap<int, QString>::iterator user_it;
+    for (user_it = userList.begin(); user_it != userList.end(); ++user_it) {
+        QJsonObject chatItem;
+        chatItem["user_id"] = user_it.key();
+        chatItem["user_name"] = user_it.value();
+        if (m_debug) {
+            qDebug() << user_it.key() << " " << user_it.value();
+        }
+        contentArray.append(chatItem);
+    }
+    QJsonObject responseMessage;
+    responseMessage["content"] = contentArray;
+
+    QJsonObject response;
+    response["method"] = requestBody.value("method").toString();
+    response["message"] = responseMessage;
+    response["status"] = 200;
 
     QJsonObject responseObj;
     responseObj["response"] = response;

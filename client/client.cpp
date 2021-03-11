@@ -24,9 +24,41 @@ void Client::disconnectServer() {
     m_webSocket.close();
 }
 
+// void Client::sendMessage(const QString &message) {
+//    m_webSocket.sendTextMessage(message);
+
+//    QByteArray ba;
+
+//    m_webSocket.sendBinaryMessage(ba);
+//}
+
 int Client::getId() const {
     return currId;
 }
+
+QString Client::getState() const {
+    using SocketState = QAbstractSocket::SocketState;
+    SocketState state = m_webSocket.state();
+    switch (state) {
+        case SocketState::ConnectedState:
+            return "OPEN";
+            break;
+        case SocketState::ConnectingState:
+            return "Connecting";
+            break;
+        case SocketState::ClosingState:
+            return "Closing";
+            break;
+        case SocketState::UnconnectedState:
+            return "Closed";
+            break;
+    }
+    return "Unknown";
+}
+
+// QJsonArray Client::searchMessage(QString message, QString chatId){
+
+//}
 
 void Client::onConnected() {
     if (m_debug) {
@@ -272,6 +304,38 @@ bool Client::registerUser(QString login, QString password) {
     QString method = responseBody.value("method").toString();
     int status = responseBody.value("status").toInt();
     currId = responseBody.value("id").toInt();
+
+    responseObj.reset();
+
+    return method == request["method"].toString() && status == 200;
+}
+
+bool Client::getUserList(QMap<int, QString> &userList) {
+    QJsonObject request;
+    request["method"] = "getUserList";
+
+    QJsonObject requestObj;
+    requestObj["request"] = request;
+
+    sendRequest(requestObj);
+
+    if (responseObj->empty()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
+
+    QJsonArray responseArray =
+        responseBody.value("message").toObject().value("content").toArray();
+    for (auto user_it : responseArray) {
+        int user_id = user_it.toObject().value("user_id").toInt();
+        QString user_name = user_it.toObject().value("user_name").toString();
+        qDebug() << user_id << " " << user_name;
+        userList[user_id] = user_name;
+    }
 
     responseObj.reset();
 
