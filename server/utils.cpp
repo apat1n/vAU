@@ -63,3 +63,40 @@
     responseObj["response"] = response;
     return responseObj;
 }
+
+// For creating response with method, content and status
+[[nodiscard]] static QJsonObject getJsonResponseInstance(QString &&method,
+                                                         QJsonObject &&content,
+                                                         int status) {
+    /*
+     * {
+     *  "responseObj": [
+     *   {
+     *    "response": [
+     *     {
+     *      "method": method,
+     *      "status": status,
+     *      "message": [
+     *       {
+     *        "content": content (QJsonObject in this context)
+     *       }
+     *      ]
+     *     }
+     *    ]
+     *   }
+     *  ]
+     * }
+     */
+
+    QJsonObject message;
+    message["content"] = content;
+
+    QJsonObject response;
+    response["method"] = method;
+    response["status"] = status;
+    response["message"] = message;
+
+    QJsonObject responseObj;
+    responseObj["response"] = response;
+    return responseObj;
+}
