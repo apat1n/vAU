@@ -13,7 +13,9 @@ TEMPLATE = app
 SOURCES += \
     main.cpp \
     server.cpp \
-    db_utils.cpp
+    db_utils.cpp \
+    server_processes.cpp \
+    utils.cpp
 
 HEADERS += \
     models/message.h \
