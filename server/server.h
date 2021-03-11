@@ -48,6 +48,7 @@ private:
 
     bool authUser(User &, QString);
     bool registerUser(QString, QString);
+    bool isAuthorized(const QJsonObject &, QWebSocket *);
 
     bool createChat(QString, int);
     QList<Chat> getChatList(User &);

@@ -9,6 +9,17 @@
 #include "server.h"
 #include "utils.cpp"
 
+bool Server::isAuthorized(const QJsonObject &requestBody, QWebSocket *pSender) {
+    if (!authenticatedUsers.contains(pSender)) {
+        QJsonObject responseObj = getJsonResponseInstance(
+            requestBody.value("method").toString(), 403);
+        QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+        pSender->sendBinaryMessage(responseBinaryMessage);
+        return false;
+    }
+    return true;
+}
+
 void Server::processLoginRequest(QJsonObject requestBody, QWebSocket *pSender) {
     QJsonObject requestMessage = requestBody.value("message").toObject();
     QString login = requestMessage.value("login").toString();
@@ -41,14 +52,17 @@ void Server::processRegisterRequest(QJsonObject requestBody,
     QString login = requestMessage.value("login").toString();
     QString password = requestMessage.value("password").toString();
 
-    bool passed = false;
     QJsonObject responseObj;
     if (registerUser(login, password)) {
+        User user = User({-1, login, pSender});
+        authUser(user, password);
+        authenticatedUsers[pSender] = user;
+
         QJsonObject content;
-        content["id"] = -1;  // TODO: creating new ID when registering new user
+        content["id"] =
+            user.id;  // TODO: creating new ID when registering new user
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), std::move(content), 200);
-        passed = true;
     } else {
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), 409);
@@ -59,12 +73,6 @@ void Server::processRegisterRequest(QJsonObject requestBody,
         qDebug() << "response" << responseBinaryMessage;
     }
     pSender->sendBinaryMessage(responseBinaryMessage);
-
-    if (passed) {
-        User user = User({-1, login, pSender});
-        authUser(user, password);
-        authenticatedUsers[pSender] = user;
-    }
 }
 
 void Server::processLogoutRequest(QJsonObject requestBody,
@@ -85,10 +93,7 @@ void Server::processLogoutRequest(QJsonObject requestBody,
 
 void Server::processGetChatListRequest(QJsonObject requestBody,
                                        QWebSocket *pSender) {
-    if (!authenticatedUsers.contains(pSender)) {
-        QJsonObject responseObj = getJsonResponseInstance(
-            requestBody.value("method").toString(), 403);
-        QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (!isAuthorized(requestBody, pSender)) {
         return;
     }
 
@@ -116,10 +121,7 @@ void Server::processGetChatListRequest(QJsonObject requestBody,
 
 void Server::proccessChatGetMessages(QJsonObject requestBody,
                                      QWebSocket *pSender) {
-    if (!authenticatedUsers.contains(pSender)) {
-        QJsonObject responseObj = getJsonResponseInstance(
-            requestBody.value("method").toString(), 403);
-        QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (!isAuthorized(requestBody, pSender)) {
         return;
     }
 
@@ -152,10 +154,7 @@ void Server::proccessChatGetMessages(QJsonObject requestBody,
 
 void Server::processCreateChatRequest(QJsonObject requestBody,
                                       QWebSocket *pSender) {
-    if (!authenticatedUsers.contains(pSender)) {
-        QJsonObject responseObj = getJsonResponseInstance(
-            requestBody.value("method").toString(), 403);
-        QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (!isAuthorized(requestBody, pSender)) {
         return;
     }
 
@@ -182,10 +181,7 @@ void Server::processCreateChatRequest(QJsonObject requestBody,
 
 void Server::processSendMessageRequest(QJsonObject requestBody,
                                        QWebSocket *pSender) {
-    if (!authenticatedUsers.contains(pSender)) {
-        QJsonObject responseObj = getJsonResponseInstance(
-            requestBody.value("method").toString(), 403);
-        QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (!isAuthorized(requestBody, pSender)) {
         return;
     }
     // if user in chat
@@ -215,10 +211,7 @@ void Server::processSendMessageRequest(QJsonObject requestBody,
 }
 
 void Server::processGetUserList(QJsonObject requestBody, QWebSocket *pSender) {
-    if (!authenticatedUsers.contains(pSender)) {
-        QJsonObject responseObj = getJsonResponseInstance(
-            requestBody.value("method").toString(), 403);
-        QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    if (!isAuthorized(requestBody, pSender)) {
         return;
     }
     // if user in chat
