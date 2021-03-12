@@ -127,12 +127,8 @@ void Server::proccessChatGetMessages(QJsonObject requestBody,
 
     QJsonArray contentArray;
     /* Filling contentArray */ {
-        int chatId = requestBody.value("message")
-                         .toObject()
-                         .value("content")
-                         .toObject()
-                         .value("chat_id")
-                         .toInt();
+        int chatId =
+            requestBody.value("message").toObject().value("chat_id").toInt();
         for (auto message_it : getMessageList(chatId)) {
             QJsonObject chatItem;
             chatItem["id"] = message_it.user_id;

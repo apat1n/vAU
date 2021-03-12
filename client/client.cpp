@@ -24,14 +24,6 @@ void Client::disconnectServer() {
     m_webSocket.close();
 }
 
-// void Client::sendMessage(const QString &message) {
-//    m_webSocket.sendTextMessage(message);
-
-//    QByteArray ba;
-
-//    m_webSocket.sendBinaryMessage(ba);
-//}
-
 int Client::getId() const {
     return currId;
 }
@@ -69,7 +61,10 @@ void Client::onConnected() {
 }
 
 void Client::onBinaryMessageReceived(QByteArray message) {
-    qDebug() << message;
+    if (m_debug) {
+        qDebug() << message;
+    }
+
     responseObj = QJsonDocument::fromJson(message).object();
     emit responseRecieved();
 }
@@ -109,235 +104,11 @@ void Client::sendRequest(const QJsonObject &requestObj) {
     }
 
     QByteArray requestBinaryMessage = QJsonDocument(requestObj).toJson();
-    qDebug() << requestBinaryMessage;
+
+    if (m_debug) {
+        qDebug() << requestBinaryMessage;
+    }
 
     m_webSocket.sendBinaryMessage(requestBinaryMessage);
     waitResponse();
-}
-
-bool Client::sendMessage(Message *messageObj, int chatId) {
-    QJsonObject message;
-    message["content"] = messageObj->getText();
-    message["chatId"] = chatId;
-
-    QJsonObject request;
-    request["message"] = message;
-    request["method"] = "sendMessage";
-
-    QJsonObject requestObj;
-    requestObj["request"] = request;
-
-    sendRequest(requestObj);
-    if (responseObj->empty()) {
-        return false;
-    }
-
-    QJsonObject responseBody = responseObj->value("response").toObject();
-    QString method = responseBody.value("method").toString();
-    int status = responseBody.value("status").toInt();
-    responseObj.reset();
-    qDebug() << "response was got";
-    return method == request["method"].toString() && status == 200;
-}
-
-bool Client::createChat(QString name) {
-    QJsonObject message;
-    message["name"] = name;
-
-    QJsonObject request;
-    request["method"] = "createChat";
-    request["message"] = message;
-
-    QJsonObject requestObj;
-    requestObj["request"] = request;
-
-    sendRequest(requestObj);
-    if (responseObj->empty()) {
-        return false;
-    }
-
-    QJsonObject responseBody = responseObj->value("response").toObject();
-    QString method = responseBody.value("method").toString();
-    int status = responseBody.value("status").toInt();
-    responseObj.reset();
-
-    return method == request["method"].toString() && status == 200;
-}
-
-bool Client::getChatList(QList<Chat *> &chatList) {
-    QJsonObject message;
-
-    QJsonObject request;
-    request["method"] = "getChatList";
-    request["message"] = message;
-
-    QJsonObject requestObj;
-    requestObj["request"] = request;
-
-    sendRequest(requestObj);
-    if (responseObj->empty()) {
-        return false;
-    }
-
-    QJsonObject responseBody = responseObj->value("response").toObject();
-    QString method = responseBody.value("method").toString();
-    int status = responseBody.value("status").toInt();
-    responseObj.reset();
-
-    if (method == request["method"].toString() && status == 200) {
-        QJsonArray responseArray =
-            responseBody.value("message").toObject().value("content").toArray();
-        for (auto chatData : responseArray) {
-            int id = chatData.toObject().value("id").toInt();
-            QString name = chatData.toObject().value("name").toString();
-            chatList.append(new Chat(id, name));
-        }
-    }
-
-    return method == request["method"].toString() && status == 200;
-}
-
-bool Client::getChatMessages(int chatId, QList<Message *> &messageHistory) {
-    QJsonObject content;
-    content["chat_id"] = chatId;
-
-    QJsonObject message;
-    message["content"] = content;
-
-    QJsonObject request;
-    request["method"] = "getChatMessages";
-    request["message"] = message;
-
-    QJsonObject requestObj;
-    requestObj["request"] = request;
-
-    sendRequest(requestObj);
-    if (responseObj->empty()) {
-        return false;
-    }
-
-    QJsonObject responseBody = responseObj->value("response").toObject();
-    QString method = responseBody.value("method").toString();
-    int status = responseBody.value("status").toInt();
-    responseObj.reset();
-
-    if (method == request["method"].toString() && status == 200) {
-        QJsonArray responseArray =
-            responseBody.value("message").toObject().value("content").toArray();
-        for (auto responseMessage : responseArray) {
-            int id = responseMessage.toObject().value("id").toInt();
-            QString messageText =
-                responseMessage.toObject().value("message_text").toString();
-            messageHistory.append(new Message(messageText, id));
-        }
-        //        qDebug() << "Got " << messageHistory.size() << " messages!";
-    }
-
-    return method == request["method"].toString() && status == 200;
-}
-
-bool Client::logoutUser() {
-    QJsonObject request;
-    request["method"] = "logout";
-    request["message"] = "";
-
-    QJsonObject requestObj;
-    requestObj["request"] = request;
-
-    sendRequest(requestObj);
-    if (responseObj->empty()) {
-        return false;
-    }
-
-    QJsonObject responseBody = responseObj->value("response").toObject();
-    QString method = responseBody.value("method").toString();
-    int status = responseBody.value("status").toInt();
-    responseObj.reset();
-
-    return method == request["method"].toString() && status == 200;
-}
-
-bool Client::loginUser(QString login, QString password) {
-    QJsonObject message;
-    message["login"] = login;
-    message["password"] = password;
-
-    QJsonObject request;
-    request["method"] = "login";
-    request["message"] = message;
-
-    QJsonObject requestObj;
-    requestObj["request"] = request;
-
-    sendRequest(requestObj);
-    if (responseObj->empty()) {
-        return false;
-    }
-
-    QJsonObject responseBody = responseObj->value("response").toObject();
-    QString method = responseBody.value("method").toString();
-    int status = responseBody.value("status").toInt();
-    currId = responseBody.value("id").toInt();
-
-    responseObj.reset();
-    return method == request["method"].toString() && status == 200;
-}
-
-bool Client::registerUser(QString login, QString password) {
-    QJsonObject message;
-    message["login"] = login;
-    message["password"] = password;
-
-    QJsonObject request;
-    request["method"] = "register";
-    request["message"] = message;
-
-    QJsonObject requestObj;
-    requestObj["request"] = request;
-
-    sendRequest(requestObj);
-    if (responseObj->empty()) {
-        return false;
-    }
-
-    QJsonObject responseBody = responseObj->value("response").toObject();
-    QString method = responseBody.value("method").toString();
-    int status = responseBody.value("status").toInt();
-    currId = responseBody.value("id").toInt();
-
-    responseObj.reset();
-
-    return method == request["method"].toString() && status == 200;
-}
-
-bool Client::getUserList(QMap<int, QString> &userList) {
-    QJsonObject request;
-    request["method"] = "getUserList";
-
-    QJsonObject requestObj;
-    requestObj["request"] = request;
-
-    sendRequest(requestObj);
-
-    if (responseObj->empty()) {
-        return false;
-    }
-
-    QJsonObject responseBody = responseObj->value("response").toObject();
-
-    QString method = responseBody.value("method").toString();
-    int status = responseBody.value("status").toInt();
-
-    QJsonArray responseArray =
-        responseBody.value("message").toObject().value("content").toArray();
-    for (auto user_it : responseArray) {
-        int user_id = user_it.toObject().value("user_id").toInt();
-        QString user_name = user_it.toObject().value("user_name").toString();
-        qDebug() << user_id << " " << user_name;
-        userList[user_id] = user_name;
-    }
-
-    responseObj.reset();
-
-    return method == request["method"].toString() && status == 200;
 }

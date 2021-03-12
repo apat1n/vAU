@@ -88,7 +88,6 @@ void MainWindow::on_messageTextField_returnPressed() {
         if (Chat *chat = dynamic_cast<Chat *>(ui->chatMenu->currentItem());
             chat) {
             if (client.sendMessage(message, chat->getChatId())) {
-                qDebug() << "Successfully sent!";
                 renderMessages(chat);
             }
         }
@@ -124,7 +123,6 @@ void MainWindow::renderMessages(Chat *chat) {
         qDebug() << "Got " << chat->getHistory().size() << " messages!";
         for (auto it : chat->getHistory()) {
             if (it) {
-                qDebug() << it->getText();
                 if (QListWidgetItem *widgetElem =
                         dynamic_cast<QListWidgetItem *>(it);
                     widgetElem) {

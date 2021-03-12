@@ -12,6 +12,7 @@ CONFIG += c++17
 SOURCES += \
     chat.cpp \
     client.cpp \
+    client_processes.cpp \
     main.cpp \
     mainwindow.cpp \
     message.cpp \

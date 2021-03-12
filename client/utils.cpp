@@ -1,5 +1,6 @@
 #include <chat.h>
 #include <QDebug>
+#include <QJsonObject>
 #include <QList>
 #include <QListWidget>
 #include <QString>
@@ -45,4 +46,59 @@ static void clearListWidget(QListWidget *listWidget) {
     while (listWidget->count() > 0) {
         listWidget->takeItem(0);
     }
+}
+
+/*
+ * Methods below using in creating QJsonObject that will be sent to server
+ */
+
+// For creating response with method
+[[nodiscard]] static QJsonObject getJsonRequestInstance(const QString &method) {
+    /*
+     * {
+     *  "requestObj": [
+     *   {
+     *    "request": [
+     *     {
+     *      "method": method,
+     *     }
+     *    ]
+     *   }
+     *  ]
+     * }
+     */
+
+    QJsonObject request;
+    request["method"] = method;
+
+    QJsonObject requestObj;
+    requestObj["request"] = request;
+    return requestObj;
+}
+
+// For creating response with method and content
+[[nodiscard]] static QJsonObject getJsonRequestInstance(const QString &method,
+                                                        QJsonObject &&message) {
+    /*
+     * {
+     *  "requestObj": [
+     *   {
+     *    "request": [
+     *     {
+     *      "method": method,
+     *      "message": message
+     *     }
+     *    ]
+     *   }
+     *  ]
+     * }
+     */
+
+    QJsonObject request;
+    request["method"] = method;
+    request["message"] = message;
+
+    QJsonObject requestObj;
+    requestObj["request"] = request;
+    return requestObj;
 }

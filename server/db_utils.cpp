@@ -39,7 +39,11 @@ QList<Chat> Server::getChatList(User &user) {
     ss << "SELECT id, name FROM QChat JOIN QChatUserList ON chat_id = id WHERE "
           "user_id = "
        << user.id << ";";
-    qDebug() << QString::fromStdString(ss.str());
+
+    if (m_debug) {
+        qDebug() << QString::fromStdString(ss.str());
+    }
+
     query.exec(QString::fromStdString(ss.str()));
 
     QList<Chat> result;
