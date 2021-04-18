@@ -21,7 +21,6 @@ public:
 
 Q_SIGNALS:
     void connectionUnstable();
-
 private slots:
 
     void on_SendButton_clicked();
@@ -40,6 +39,10 @@ private slots:
 
     void on_chatMenu_itemClicked(QListWidgetItem *item);
 
+    void on_pushButton_clicked();
+
+    void newChat(QString name);
+
 private:
     void onConnectionUnstable();
     void updateChats();
@@ -48,8 +51,6 @@ private:
 
     Ui::MainWindow *ui;
     Client client;
-
     QList<Chat *> availableChats;
-    QListWidgetItem *createChat;
 };
 #endif  // MAINWINDOW_H

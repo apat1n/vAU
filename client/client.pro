@@ -12,6 +12,7 @@ CONFIG += c++17
 SOURCES += \
     chat.cpp \
     client.cpp \
+    creatingChat.cpp \
     main.cpp \
     mainwindow.cpp \
     message.cpp \
@@ -20,10 +21,12 @@ SOURCES += \
 HEADERS += \
     chat.h \
     client.h \
+    creatingChat.h \
     mainwindow.h \
     message.h
 
 FORMS += \
+    creatingChat.ui \
     mainwindow.ui
 
 # Default rules for deployment.
