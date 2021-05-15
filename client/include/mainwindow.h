@@ -21,7 +21,6 @@ public:
 
 Q_SIGNALS:
     void connectionUnstable();
-
 private slots:
 
     void on_SendButton_clicked();
@@ -52,7 +51,6 @@ private:
 
     Ui::MainWindow *ui;
     Client client;
-
     QList<Chat *> availableChats;
     QMap<int, QString> availibleUsers;
 };
