@@ -44,13 +44,16 @@ private:
     void processCreateChatRequest(QJsonObject, QWebSocket *);
     void proccessChatGetMessages(QJsonObject, QWebSocket *);
     void processSendMessageRequest(QJsonObject, QWebSocket *);
+    void processGetUserList(QJsonObject, QWebSocket *);
 
     bool authUser(User &, QString);
     bool registerUser(QString, QString);
+    bool isAuthorized(const QJsonObject &, QWebSocket *);
 
     bool createChat(QString, int);
     QList<Chat> getChatList(User &);
     QList<Message> getMessageList(int chatId);
+    QMap<int, QString> getUserList();
 
     bool createMessage(int, int, QString, QDate);
 };

@@ -46,6 +46,7 @@ public:
     bool createChat(QString name);
     bool getChatList(QList<Chat *> &chatList);
     bool getChatMessages(int chatId, QList<Message *> &messageHistory);
+    bool getUserList(QMap<int, QString> &);
     void waitResponse();
     void sendRequest(const QJsonObject &requestObj);
     bool loginUser(QString login, QString password);

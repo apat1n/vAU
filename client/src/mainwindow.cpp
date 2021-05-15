@@ -1,23 +1,19 @@
 #include "mainwindow.h"
 #include <iostream>
 #include <utility>
+#include "createChat.h"
 #include "ui_mainwindow.h"
 #include "utils.cpp"
-#include <QMessageBox>
-#include "creatingChat.h"
-#include <QtCore/QDebug>
 
 MainWindow::MainWindow(const QString &server_url, QWidget *parent)
-    : QMainWindow(parent),
-      ui(new Ui::MainWindow),
-      client(server_url) {
+    : QMainWindow(parent), ui(new Ui::MainWindow), client(server_url) {
     ui->setupUi(this);
-    ui->stackedWidget->setCurrentIndex(0);
     ui->errorLogin->hide();
     ui->errorRegister->hide();
     ui->labelUnstableConnection->hide();
     client.connectServer();
     ui->inputPassword->setEchoMode(QLineEdit::Password);
+
     connect(&client, &Client::connectionUnstable, this,
             &MainWindow::onConnectionUnstable);
     ui->chatView->hide();
@@ -89,7 +85,6 @@ void MainWindow::on_messageTextField_returnPressed() {
         if (Chat *chat = dynamic_cast<Chat *>(ui->chatMenu->currentItem());
             chat) {
             if (client.sendMessage(message, chat->getChatId())) {
-                qDebug() << "Successfully sent!";
                 renderMessages(chat);
             }
         }
@@ -106,6 +101,7 @@ void MainWindow::on_search_textEdited(const QString &searchRequest) {
 }
 
 void MainWindow::renderChats(const QList<Chat *> &chatsList) {
+    client.getUserList(availibleUsers);
     clearListWidget(ui->chatMenu);
     for (auto it : chatsList) {
         QListWidgetItem *item = it;
@@ -115,6 +111,7 @@ void MainWindow::renderChats(const QList<Chat *> &chatsList) {
 }
 
 void MainWindow::renderMessages(Chat *chat) {
+    client.getUserList(availibleUsers);
     QList<Message *> newHistory;
     if (client.getChatMessages(chat->getChatId(), newHistory)) {
         clearListWidget(ui->chatView);
@@ -122,11 +119,14 @@ void MainWindow::renderMessages(Chat *chat) {
         qDebug() << "Got " << chat->getHistory().size() << " messages!";
         for (auto it : chat->getHistory()) {
             if (it) {
-                qDebug() << it->getText();
                 if (QListWidgetItem *widgetElem =
                         dynamic_cast<QListWidgetItem *>(it);
                     widgetElem) {
-                    widgetElem->setText(it->getText());
+                    QString textField = "[ " +
+                                        availibleUsers[it->getAuthorId()] +
+                                        " ] : " + it->getText();
+                    qDebug() << textField;
+                    widgetElem->setText(textField);
                     ui->chatView->addItem(widgetElem);
                 }
             }
@@ -143,7 +143,7 @@ void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
     }
 }
 
-void MainWindow::newChat(QString name){
+void MainWindow::newChat(QString name) {
     if (client.createChat(name)) {
         updateChats();
     }
@@ -159,9 +159,9 @@ void MainWindow::updateChats() {
     renderChats(availableChats);
 }
 
-void MainWindow::on_pushButton_clicked()
-{
+void MainWindow::on_createChatButton_clicked() {
     Dialog creating;
-    connect(&creating,SIGNAL(requestCreating(const QString&)),this,SLOT(newChat(const QString&)));
+    connect(&creating, SIGNAL(requestCreating(const QString &)), this,
+            SLOT(newChat(const QString &)));
     creating.exec();
 }

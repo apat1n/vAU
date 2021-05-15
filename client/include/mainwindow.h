@@ -39,7 +39,7 @@ private slots:
 
     void on_chatMenu_itemClicked(QListWidgetItem *item);
 
-    void on_pushButton_clicked();
+    void on_createChatButton_clicked();
 
     void newChat(QString name);
 
@@ -52,5 +52,6 @@ private:
     Ui::MainWindow *ui;
     Client client;
     QList<Chat *> availableChats;
+    QMap<int, QString> availibleUsers;
 };
 #endif  // MAINWINDOW_H

@@ -15,3 +15,7 @@ QString Message::getText() const {
 QString Message::getAuthor() const {
     return author;
 }
+
+int Message::getAuthorId() const {
+    return authorId;
+}
