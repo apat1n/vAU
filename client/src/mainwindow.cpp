@@ -1,13 +1,13 @@
-#include "mainwindow.h"
 #include <iostream>
 #include <utility>
-#include "ui_mainwindow.h"
 #include "utils.cpp"
+#include "createChat.h"
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
 
 MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), client(server_url) {
     ui->setupUi(this);
-    ui->stackedWidget->setCurrentIndex(0);
     ui->errorLogin->hide();
     ui->errorRegister->hide();
     ui->labelUnstableConnection->hide();
@@ -143,6 +143,12 @@ void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
     }
 }
 
+void MainWindow::newChat(QString name){
+    if (client.createChat(name)) {
+        updateChats();
+    }
+}
+
 void MainWindow::updateChats() {
     QList<Chat *> newAvailableChats;
     if (client.getChatList(newAvailableChats)) {
@@ -154,7 +160,7 @@ void MainWindow::updateChats() {
 }
 
 void MainWindow::on_createChatButton_clicked() {
-    //    Dialog creating;
-    //    connect(&creating,SIGNAL(requestCreating(const
-    //    QString&)),this,SLOT(newChat(const QString&))); creating.exec();
+    Dialog creating;
+    connect(&creating,SIGNAL(requestCreating(const QString&)),this,SLOT(newChat(const QString&)));
+    creating.exec();
 }

@@ -42,6 +42,8 @@ private slots:
 
     void on_createChatButton_clicked();
 
+    void newChat(QString name);
+
 private:
     void onConnectionUnstable();
     void updateChats();

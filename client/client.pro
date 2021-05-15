@@ -27,7 +27,7 @@ HEADERS += \
     include/message.h
 
 FORMS += \
-    ui/mainwindow.ui
+    ui/mainwindow.ui \
     ui/createChat.ui
 
 INCLUDEPATH += include
