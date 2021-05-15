@@ -11,18 +11,20 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += \
-    main.cpp \
-    server.cpp \
-    db_utils.cpp \
-    server_processes.cpp \
-    utils.cpp
+    src/main.cpp \
+    src/server.cpp \
+    src/db_utils.cpp \
+    src/server_processes.cpp \
+    src/utils.cpp
 
 HEADERS += \
-    models/message.h \
-    server.h \
-    models/common.h \
-    models/user.h \
-    models/chat.h
+    include/models/message.h \
+    include/server.h \
+    include/models/common.h \
+    include/models/user.h \
+    include/models/chat.h
+
+INCLUDEPATH += include
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

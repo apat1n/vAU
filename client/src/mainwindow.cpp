@@ -7,8 +7,7 @@
 MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::MainWindow),
-      client(server_url),
-      createChat(new QListWidgetItem("Create new chat")) {
+      client(server_url) {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
     ui->errorLogin->hide();
@@ -106,7 +105,6 @@ void MainWindow::on_search_textEdited(const QString &searchRequest) {
 void MainWindow::renderChats(const QList<Chat *> &chatsList) {
     client.getUserList(availibleUsers);
     clearListWidget(ui->chatMenu);
-    ui->chatMenu->addItem(createChat);
     for (auto it : chatsList) {
         QListWidgetItem *item = it;
         item->setText(it->getName());
@@ -140,17 +138,10 @@ void MainWindow::renderMessages(Chat *chat) {
 }
 
 void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
-    if (item == createChat) {
-        ui->chatView->hide();
-        if (client.createChat("test_chat")) {
-            updateChats();
-        }
-    } else {
-        Chat *chat = dynamic_cast<Chat *>(item);
-        if (chat) {
-            ui->chatView->show();
-            renderMessages(chat);
-        }
+    Chat *chat = dynamic_cast<Chat *>(item);
+    if (chat) {
+        ui->chatView->show();
+        renderMessages(chat);
     }
 }
 
@@ -162,4 +153,11 @@ void MainWindow::updateChats() {
         std::swap(newAvailableChats, availableChats);
     }
     renderChats(availableChats);
+}
+
+void MainWindow::on_createChatButton_clicked()
+{
+//    Dialog creating;
+//    connect(&creating,SIGNAL(requestCreating(const QString&)),this,SLOT(newChat(const QString&)));
+//    creating.exec();
 }

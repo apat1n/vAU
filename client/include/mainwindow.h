@@ -40,6 +40,8 @@ private slots:
 
     void on_chatMenu_itemClicked(QListWidgetItem *item);
 
+    void on_createChatButton_clicked();
+
 private:
     void onConnectionUnstable();
     void updateChats();
@@ -50,7 +52,6 @@ private:
     Client client;
 
     QList<Chat *> availableChats;
-    QListWidgetItem *createChat;
     QMap<int, QString> availibleUsers;
 };
 #endif  // MAINWINDOW_H
