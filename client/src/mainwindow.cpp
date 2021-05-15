@@ -5,9 +5,7 @@
 #include "utils.cpp"
 
 MainWindow::MainWindow(const QString &server_url, QWidget *parent)
-    : QMainWindow(parent),
-      ui(new Ui::MainWindow),
-      client(server_url) {
+    : QMainWindow(parent), ui(new Ui::MainWindow), client(server_url) {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
     ui->errorLogin->hide();
@@ -155,9 +153,8 @@ void MainWindow::updateChats() {
     renderChats(availableChats);
 }
 
-void MainWindow::on_createChatButton_clicked()
-{
-//    Dialog creating;
-//    connect(&creating,SIGNAL(requestCreating(const QString&)),this,SLOT(newChat(const QString&)));
-//    creating.exec();
+void MainWindow::on_createChatButton_clicked() {
+    //    Dialog creating;
+    //    connect(&creating,SIGNAL(requestCreating(const
+    //    QString&)),this,SLOT(newChat(const QString&))); creating.exec();
 }
