@@ -1,5 +1,7 @@
 #include <chat.h>
 #include <QDebug>
+#include <QDir>
+#include <QImage>
 #include <QJsonObject>
 #include <QList>
 #include <QListWidget>
@@ -46,6 +48,18 @@ static void clearListWidget(QListWidget *listWidget) {
     while (listWidget->count() > 0) {
         listWidget->takeItem(0);
     }
+}
+
+static void saveImage(QImage &image, QString &filename) {
+    QDir dirPath = QDir::currentPath() + "/" + "images";
+    if (!dirPath.exists()) {
+        dirPath.mkpath(".");
+    }
+    image.save(dirPath.absolutePath() + "/" + filename);
+}
+
+static QImage loadImage(QString &filename) {
+    return QImage(QDir::currentPath() + "/" + "images" + "/" + filename);
 }
 
 /*

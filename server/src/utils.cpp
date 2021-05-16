@@ -1,4 +1,18 @@
+#include <QDir>
+#include <QImage>
 #include "QJsonObject"
+
+static void saveImage(QImage &image, QString &filename) {
+    QDir dirPath = QDir::currentPath() + "/" + "images";
+    if (!dirPath.exists()) {
+        dirPath.mkpath(".");
+    }
+    image.save(dirPath.absolutePath() + "/" + filename);
+}
+
+static QImage loadImage(QString &filename) {
+    return QImage(QDir::currentPath() + "/" + "images" + "/" + filename);
+}
 
 // For creating response with method and status
 [[nodiscard]] static QJsonObject getJsonResponseInstance(QString &&method,
