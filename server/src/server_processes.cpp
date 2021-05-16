@@ -1,3 +1,4 @@
+#include <QImage>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -229,6 +230,32 @@ void Server::processGetUserList(QJsonObject requestBody, QWebSocket *pSender) {
 
     QJsonObject responseObj = getJsonResponseInstance(
         requestBody.value("method").toString(), std::move(contentArray), 200);
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
+void Server::processUpdateUserPhoto(QJsonObject requestBody,
+                                    QWebSocket *pSender) {
+    if (!isAuthorized(requestBody, pSender)) {
+        return;
+    }
+
+    QJsonObject requestMessage = requestBody.value("message").toObject();
+    QString photoBase64 = requestMessage.value("content").toString();
+
+    QImage image =
+        QImage::fromData(QByteArray::fromBase64(photoBase64.toUtf8()), "png");
+    if (m_debug) {
+        qDebug() << "Get image with size" << image.size();
+    }
+
+    // TODO: реализовать сохранение картинки и сделать запись в БД
+    QJsonObject responseObj =
+        getJsonResponseInstance(requestBody.value("method").toString(), 200);
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {

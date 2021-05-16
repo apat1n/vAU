@@ -1,4 +1,5 @@
 #include <chat.h>
+#include <QBuffer>
 #include <QDebug>
 #include <QDir>
 #include <QImage>
@@ -31,6 +32,14 @@
         }
     }
     return *std::max_element(z.begin(), z.end()) == pattern.size();
+}
+
+[[nodiscard]] static QString imageToBase64(QImage &image) {
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    image.save(&buffer,
+               "PNG");  // writes the image in PNG format inside the buffer
+    return QString::fromUtf8(byteArray.toBase64().data());
 }
 
 [[nodiscard]] static QList<Chat *> foundMatches(const QList<Chat *> input,
