@@ -46,6 +46,7 @@ private:
     void proccessChatGetMessages(QJsonObject, QWebSocket *);
     void processSendMessageRequest(QJsonObject, QWebSocket *);
     void processGetUserList(QJsonObject, QWebSocket *);
+    void processUpdateUserPhoto(QJsonObject, QWebSocket *);
 
     bool isAuthorized(const QJsonObject &, QWebSocket *);
 };
