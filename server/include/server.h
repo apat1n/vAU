@@ -49,6 +49,14 @@ private:
     void processUpdateUserPhoto(QJsonObject, QWebSocket *);
 
     bool isAuthorized(const QJsonObject &, QWebSocket *);
+    bool updateUserPhoto(User &, QImage &);
+
+    bool createChat(QString, int);
+    QList<Chat> getChatList(User &);
+    QList<Message> getMessageList(int chatId);
+    QMap<int, QString> getUserList();
+
+    bool createMessage(int, int, QString, QDate);
 };
 
 #endif  // SERVER_H
