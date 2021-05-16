@@ -246,6 +246,7 @@ void Server::processUpdateUserPhoto(QJsonObject requestBody,
 
     QJsonObject requestMessage = requestBody.value("message").toObject();
     QString photoBase64 = requestMessage.value("content").toString();
+    QString userId = requestMessage.value("userId").toString();
 
     QImage image =
         QImage::fromData(QByteArray::fromBase64(photoBase64.toUtf8()), "png");
@@ -254,6 +255,8 @@ void Server::processUpdateUserPhoto(QJsonObject requestBody,
     }
 
     // TODO: реализовать сохранение картинки и сделать запись в БД
+    saveImage(image, "user_original_" + userId);
+
     QJsonObject responseObj =
         getJsonResponseInstance(requestBody.value("method").toString(), 200);
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
