@@ -7,9 +7,9 @@ bool Client::sendMessage(Message *messageObj, int chatId) {
     message["content"] = messageObj->getText();
     message["chatId"] = chatId;
 
-    QString sentMessage = "sendMessage";
+    QString sentMethod = "sendMessage";
     QJsonObject requestObj =
-        getJsonRequestInstance(sentMessage, std::move(message));
+        getJsonRequestInstance(sentMethod, std::move(message));
 
     sendRequest(requestObj);
     if (responseObj->empty()) {
@@ -21,16 +21,16 @@ bool Client::sendMessage(Message *messageObj, int chatId) {
     int status = responseBody.value("status").toInt();
     responseObj.reset();
 
-    return method == sentMessage && status == 200;
+    return method == sentMethod && status == 200;
 }
 
 bool Client::createChat(QString name) {
     QJsonObject message;
     message["name"] = name;
 
-    QString sentMessage = "createChat";
+    QString sentMethod = "createChat";
     QJsonObject requestObj =
-        getJsonRequestInstance(sentMessage, std::move(message));
+        getJsonRequestInstance(sentMethod, std::move(message));
     sendRequest(requestObj);
     if (responseObj->empty()) {
         return false;
@@ -41,7 +41,7 @@ bool Client::createChat(QString name) {
     int status = responseBody.value("status").toInt();
     responseObj.reset();
 
-    return method == sentMessage && status == 200;
+    return method == sentMethod && status == 200;
 }
 
 bool Client::getChatList(QList<Chat *> &chatList) {
@@ -125,9 +125,9 @@ bool Client::loginUser(QString login, QString password) {
     message["login"] = login;
     message["password"] = password;
 
-    QString sentMessage = "login";
+    QString sentMethod = "login";
     QJsonObject requestObj =
-        getJsonRequestInstance(sentMessage, std::move(message));
+        getJsonRequestInstance(sentMethod, std::move(message));
 
     sendRequest(requestObj);
     if (responseObj->empty()) {
@@ -140,7 +140,7 @@ bool Client::loginUser(QString login, QString password) {
     currId = responseBody.value("id").toInt();
 
     responseObj.reset();
-    return method == sentMessage && status == 200;
+    return method == sentMethod && status == 200;
 }
 
 bool Client::registerUser(QString login, QString password) {
@@ -148,9 +148,9 @@ bool Client::registerUser(QString login, QString password) {
     message["login"] = login;
     message["password"] = password;
 
-    QString sentMessage = "register";
+    QString sentMethod = "register";
     QJsonObject requestObj =
-        getJsonRequestInstance(sentMessage, std::move(message));
+        getJsonRequestInstance(sentMethod, std::move(message));
 
     sendRequest(requestObj);
     if (responseObj->empty()) {
@@ -164,7 +164,7 @@ bool Client::registerUser(QString login, QString password) {
 
     responseObj.reset();
 
-    return method == sentMessage && status == 200;
+    return method == sentMethod && status == 200;
 }
 
 bool Client::getUserList(QMap<int, QString> &userList) {
@@ -194,6 +194,28 @@ bool Client::getUserList(QMap<int, QString> &userList) {
         userList[user_id] = user_name;
     }
 
+    responseObj.reset();
+
+    return method == sentMethod && status == 200;
+}
+
+bool Client::updateUserPhoto(QImage &photo, int userId) {
+    QJsonObject message;
+    message["content"] = imageToBase64(photo);
+    message["user"] = userId;
+
+    QString sentMethod = "updateUserPhoto";
+    QJsonObject requestObj =
+        getJsonRequestInstance(sentMethod, std::move(message));
+
+    sendRequest(requestObj);
+    if (responseObj->empty()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
     responseObj.reset();
 
     return method == sentMethod && status == 200;
