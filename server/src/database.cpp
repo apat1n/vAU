@@ -1,7 +1,27 @@
+#include "database.h"
 #include <sstream>
-#include "server.h"
 
-bool Server::authUser(User &user, QString password) {
+Database::Database(const QString &url,
+                   int port,
+                   const QString &name,
+                   const QString &username,
+                   const QString &password,
+                   bool debug)
+    : m_debug(debug) {
+    db = QSqlDatabase::addDatabase("QPSQL");
+
+    db.setHostName(url);
+    db.setPort(port);
+    db.setDatabaseName(name);
+    db.setUserName(username);
+    db.setPassword(password);
+
+    if (m_debug) {
+        qDebug() << "SQL connection: " << (db.open() ? "opened" : "closed");
+    }
+}
+
+bool Database::authUser(User &user, QString password) {
     QSqlQuery query(db);
     QString queryLogin = user.login;
     std::stringstream ss;
@@ -23,7 +43,7 @@ bool Server::authUser(User &user, QString password) {
     return password_hash == password;
 }
 
-bool Server::registerUser(QString login, QString password) {
+bool Database::registerUser(QString login, QString password) {
     QSqlQuery query(db);
     std::stringstream ss;
 
@@ -33,7 +53,7 @@ bool Server::registerUser(QString login, QString password) {
     return query.exec(QString::fromStdString(ss.str()));
 }
 
-QList<Chat> Server::getChatList(User &user) {
+QList<Chat> Database::getChatList(User &user) {
     QSqlQuery query(db);
     std::stringstream ss;
     ss << "SELECT id, name FROM QChat JOIN QChatUserList ON chat_id = id WHERE "
@@ -56,7 +76,7 @@ QList<Chat> Server::getChatList(User &user) {
     return result;
 }
 
-QList<Message> Server::getMessageList(int chatId) {
+QList<Message> Database::getMessageList(int chatId) {
     QSqlQuery query(db);
     std::stringstream ss;
     ss << "SELECT id, user_id, message, message_date FROM QChatMessages WHERE "
@@ -82,7 +102,7 @@ QList<Message> Server::getMessageList(int chatId) {
     return result;
 }
 
-bool Server::createChat(QString name, int user_id) {
+bool Database::createChat(QString name, int user_id) {
     QSqlQuery query(db);
     std::stringstream ss;
 
@@ -106,10 +126,10 @@ bool Server::createChat(QString name, int user_id) {
     return false;
 }
 
-bool Server::createMessage(int chat_id,
-                           int user_id,
-                           QString message,
-                           QDate date) {
+bool Database::createMessage(int chat_id,
+                             int user_id,
+                             QString message,
+                             QDate date) {
     QSqlQuery query(db);
     std::stringstream ss;
 
@@ -128,7 +148,7 @@ bool Server::createMessage(int chat_id,
     return query.exec(QString::fromStdString(ss.str()));
 }
 
-QMap<int, QString> Server::getUserList() {
+QMap<int, QString> Database::getUserList() {
     QSqlQuery query(db);
     std::stringstream ss;
     ss << "SELECT id, login FROM quser;";
