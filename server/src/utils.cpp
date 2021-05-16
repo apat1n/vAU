@@ -2,7 +2,7 @@
 #include <QImage>
 #include "QJsonObject"
 
-static void saveImage(QImage &image, QString &filename) {
+static void saveImage(const QImage &image, const QString &filename) {
     QDir dirPath = QDir::currentPath() + "/" + "images";
     if (!dirPath.exists()) {
         dirPath.mkpath(".");
@@ -10,7 +10,7 @@ static void saveImage(QImage &image, QString &filename) {
     image.save(dirPath.absolutePath() + "/" + filename);
 }
 
-static QImage loadImage(QString &filename) {
+static QImage loadImage(const QString &filename) {
     return QImage(QDir::currentPath() + "/" + "images" + "/" + filename);
 }
 
