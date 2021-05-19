@@ -159,9 +159,17 @@ void MainWindow::updateChats() {
     renderChats(availableChats);
 }
 
+void MainWindow::inviteUser(int id){
+    qDebug() << id;
+}
+
 void MainWindow::on_createChatButton_clicked() {
-    Dialog creating;
+    QMap<int, QString> users;
+    client.getUserList(users);
+    Dialog creating(users);
+    connect(&creating, SIGNAL(requestAddUser(int)), this, SLOT(inviteUser(int)));
     connect(&creating, SIGNAL(requestCreating(const QString &)), this,
             SLOT(newChat(const QString &)));
+
     creating.exec();
 }
