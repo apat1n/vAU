@@ -60,7 +60,7 @@ void MainWindow::on_registerButton_clicked() {
     QString password = ui->inputPassword->text();
 
     if (client.registerUser(login, password)) {
-        ui->stackedWidget->setCurrentIndex(1);
+        ui->stackedWidget->setCurrentIndex(2);
         updateChats();
         ui->errorRegister->hide();
     } else {
