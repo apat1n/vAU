@@ -19,7 +19,7 @@ public:
 private slots:
     void on_createChat_clicked();
 
-//    void on_avaliableUsers_itemClicked(QListWidgetItem *item);
+    void on_avaliableUsers_itemClicked(QListWidgetItem *item);
 
 private:
     Ui::Dialog *ui;

@@ -3,6 +3,7 @@
 #include "client.h"
 #include <QListWidget>
 #include <QtCore/QDebug>
+#include "utils.cpp"
 Dialog::Dialog(QMap<int,QString> users_, QWidget *parent) : QDialog(parent), ui(new Ui::Dialog){
 
     ui->setupUi(this);
@@ -12,8 +13,7 @@ Dialog::Dialog(QMap<int,QString> users_, QWidget *parent) : QDialog(parent), ui(
         it->setText(i.value());
         it->setCheckState(Qt::Unchecked);
         it->setData(Qt::UserRole,i.key());
-//        it->setIcon(QIcon("/home/vtgcon/Загрузки/aa88d9c40c496abf8d09897c1816082ee0a69817.jpeg"));
-//  так я буду ставить иконки юзеров, можете раскоментить и проверить своей фоткой, что все работает)
+        it->setIcon(getUserImage(i.key()));
         ui->avaliableUsers->addItem(it);
     }
 }
@@ -35,22 +35,6 @@ void Dialog::on_createChat_clicked() {
     }
 }
 
-//void Dialog::on_avaliableUsers_itemClicked(QListWidgetItem *item)
-//{
-//    QListWidgetItem *it = new QListWidgetItem();
-//    it->setText(item->text());
-//    int a = item->data(Qt::UserRole).toInt();
-//    qDebug() << a;
-//    it->setData(Qt::UserRole,a);
-//    bool flag = false;
-//    for (int i = 0; i < ui->invitedUsers->count(); i++){
-//        if (ui->invitedUsers->item(i)->data(Qt::UserRole).toInt()==a){
-//            flag = true;
-//        }
-//    }
-//    if (flag == false){
-//       ui->invitedUsers->addItem(it);
-//    } else {
-//        delete it;
-//    }
-//}
+void Dialog::on_avaliableUsers_itemClicked(QListWidgetItem *item)
+{
+}
