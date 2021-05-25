@@ -28,7 +28,7 @@ void Server::processLoginRequest(QJsonObject requestBody, QWebSocket *pSender) {
     User user{-1, login, pSender};
 
     QJsonObject responseObj;
-    if (authUser(user, password)) {
+    if (db.authUser(user, password)) {
         authenticatedUsers[pSender] = user;
         QJsonObject content;
         content["id"] = user.id;
@@ -53,9 +53,9 @@ void Server::processRegisterRequest(QJsonObject requestBody,
     QString password = requestMessage.value("password").toString();
 
     QJsonObject responseObj;
-    if (registerUser(login, password)) {
+    if (db.registerUser(login, password)) {
         User user = User({-1, login, pSender});
-        authUser(user, password);
+        db.authUser(user, password);
         authenticatedUsers[pSender] = user;
 
         QJsonObject content;
@@ -100,7 +100,7 @@ void Server::processGetChatListRequest(QJsonObject requestBody,
     QJsonArray contentArray;
     /* Filling contentArray */ {
         User user = authenticatedUsers[pSender];
-        for (auto chat : getChatList(user)) {
+        for (auto chat : db.getChatList(user)) {
             QJsonObject chatItem;
             chatItem["id"] = chat.id;
             chatItem["name"] = chat.name;
@@ -129,7 +129,7 @@ void Server::proccessChatGetMessages(QJsonObject requestBody,
     /* Filling contentArray */ {
         int chatId =
             requestBody.value("message").toObject().value("chat_id").toInt();
-        for (auto message_it : getMessageList(chatId)) {
+        for (auto message_it : db.getMessageList(chatId)) {
             QJsonObject chatItem;
             chatItem["id"] = message_it.user_id;
             chatItem["message_text"] = message_it.message;
@@ -160,7 +160,7 @@ void Server::processCreateChatRequest(QJsonObject requestBody,
     int user_id = authenticatedUsers[pSender].id;
 
     QJsonObject responseObj;
-    if (createChat(name, user_id)) {
+    if (db.createChat(name, user_id)) {
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), 200);
     } else {
@@ -191,7 +191,7 @@ void Server::processSendMessageRequest(QJsonObject requestBody,
     QDate date = QDate::currentDate();
 
     QJsonObject responseObj;
-    if (createMessage(chat_id, user_id, text_message, date)) {
+    if (db.createMessage(chat_id, user_id, text_message, date)) {
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), 200);
     } else {
@@ -214,7 +214,7 @@ void Server::processGetUserList(QJsonObject requestBody, QWebSocket *pSender) {
 
     QJsonArray contentArray;
     /* Filling contentArray */ {
-        QMap<int, QString> userList = getUserList();
+        QMap<int, QString> userList = db.getUserList();
         QMap<int, QString>::iterator user_it;
         for (user_it = userList.begin(); user_it != userList.end(); ++user_it) {
             QJsonObject chatItem;
