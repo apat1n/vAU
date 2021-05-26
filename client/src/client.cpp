@@ -66,7 +66,16 @@ void Client::onBinaryMessageReceived(QByteArray message) {
     }
 
     responseObj = QJsonDocument::fromJson(message).object();
-
+    if (responseObj->value("response")
+            .toObject()
+            .value("message")
+            .toObject()
+            .value("content")
+            .toObject()
+            .contains("push")) {
+        // emit signal
+        qDebug() << "PUSHED!";
+    }
     emit responseRecieved();
 }
 

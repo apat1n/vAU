@@ -194,27 +194,44 @@ void Server::processSendMessageRequest(QJsonObject requestBody,
     QString text_message = requestMessage.value("content").toString();
     QDate date = QDate::currentDate();
 
-    QJsonObject responseObj;
+    QJsonObject responseObj, responsePushObj;
+
     if (createMessage(chat_id, user_id, text_message, date)) {
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), 200);
+
+        QJsonObject message;
+        message["push"] = 1;
+        responsePushObj = getJsonResponseInstance(
+            requestBody.value("method").toString(), std::move(message), 200);
+
     } else {
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), 401);
     }
 
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    QByteArray responsePushBinaryMessage =
+        QJsonDocument(responsePushObj).toJson();
+
     if (m_debug) {
-        qDebug() << "response" << responseBinaryMessage;
+        qDebug() << "response" << responseBinaryMessage
+                 << "\n ============================ \n"
+                 << responsePushBinaryMessage;
     }
 
     QMap<int, QString> userList = getUserList(chat_id);
     for (QMap<int, QString>::iterator user_it = userList.begin();
          user_it != userList.end(); ++user_it) {
-        qDebug() << user_it.key();
-        if (authenticatedUsersId.contains(user_it.key()))
-            authenticatedUsersId[user_it.key()]->sendBinaryMessage(
-                responseBinaryMessage);
+        if (authenticatedUsersId.contains(user_it.key())) {
+            if (authenticatedUsersId[user_it.key()] == pSender) {
+                authenticatedUsersId[user_it.key()]->sendBinaryMessage(
+                    responseBinaryMessage);
+            } else {
+                authenticatedUsersId[user_it.key()]->sendBinaryMessage(
+                    responsePushBinaryMessage);
+            }
+        }
     }
 }
 
