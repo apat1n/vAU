@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QProcessEnvironment>
+#include <QPixmap>
 #include <QtCore/QDebug>
 #include "QtWebSockets/qwebsocket.h"
 #include "QtWebSockets/qwebsocketserver.h"
@@ -246,7 +247,7 @@ void Server::processUpdateUserPhoto(QJsonObject requestBody,
 
     QJsonObject requestMessage = requestBody.value("message").toObject();
     QString photoBase64 = requestMessage.value("content").toString();
-    QString userId = requestMessage.value("userId").toString();
+    int userId = authenticatedUsers[pSender].id;
 
     QImage image =
         QImage::fromData(QByteArray::fromBase64(photoBase64.toUtf8()), "png");
@@ -254,11 +255,46 @@ void Server::processUpdateUserPhoto(QJsonObject requestBody,
         qDebug() << "Get image with size" << image.size();
     }
 
-    // TODO: реализовать сохранение картинки и сделать запись в БД
-    saveImage(image, "user_original_" + userId);
+    // TODO: сделать запись в БД
+    saveImage(image, QString("user_original_%1").arg(userId));
 
     QJsonObject responseObj =
         getJsonResponseInstance(requestBody.value("method").toString(), 200);
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
+void Server::processGetUserPhoto(QJsonObject requestBody,
+                                    QWebSocket *pSender) {
+    if (!isAuthorized(requestBody, pSender)) {
+        return;
+    }
+
+    int userId = authenticatedUsers[pSender].id;
+
+    // TODO: читать путь из БД
+    QImage photo;
+    try {
+        photo = loadImage(QString("user_original_%1").arg(userId));
+    } catch (...) {
+        photo = QImage(256, 256, QImage::Format_RGB32);
+        photo.fill(Qt::blue);
+    }
+
+    if (m_debug) {
+        qDebug() << "Send image with size" << photo.size();
+    }
+
+    QJsonObject message;
+    message["image"] = imageToBase64(photo);
+
+    QString sentMethod = "updateUserPhoto";
+    QJsonObject responseObj =
+        getJsonResponseInstance(requestBody.value("method").toString(), std::move(message), 200);
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {

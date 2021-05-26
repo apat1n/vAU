@@ -51,7 +51,8 @@ public:
     void sendRequest(const QJsonObject &requestObj);
     bool loginUser(QString login, QString password);
     bool registerUser(QString login, QString password);
-    bool updateUserPhoto(QImage &photo, int userId);
+    bool updateUserPhoto(QImage &photo);
+    bool getUserPhoto(QImage &photo);
 };
 
 #endif  // ECHOCLIENT_H

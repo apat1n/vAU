@@ -1,6 +1,15 @@
 #include <QDir>
 #include <QImage>
 #include "QJsonObject"
+#include <QBuffer>
+
+[[nodiscard]] static QString imageToBase64(const QImage &image) {
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    image.save(&buffer,
+               "PNG");  // writes the image in PNG format inside the buffer
+    return QString::fromUtf8(byteArray.toBase64().data());
+}
 
 static void saveImage(const QImage &image, const QString &filename) {
     QDir dirPath = QDir::currentPath() + "/" + "images";
@@ -11,6 +20,9 @@ static void saveImage(const QImage &image, const QString &filename) {
 }
 
 static QImage loadImage(const QString &filename) {
+    if (!QDir(QDir::currentPath() + "/" + "images" + "/" + filename).exists()) {
+        throw std::runtime_error("no such image!");
+    }
     return QImage(QDir::currentPath() + "/" + "images" + "/" + filename);
 }
 

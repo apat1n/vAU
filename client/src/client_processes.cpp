@@ -199,10 +199,9 @@ bool Client::getUserList(QMap<int, QString> &userList) {
     return method == sentMethod && status == 200;
 }
 
-bool Client::updateUserPhoto(QImage &photo, int userId) {
+bool Client::updateUserPhoto(QImage &photo) {
     QJsonObject message;
     message["content"] = imageToBase64(photo);
-    message["user"] = userId;
 
     QString sentMethod = "updateUserPhoto";
     QJsonObject requestObj =
@@ -216,6 +215,37 @@ bool Client::updateUserPhoto(QImage &photo, int userId) {
     QJsonObject responseBody = responseObj->value("response").toObject();
     QString method = responseBody.value("method").toString();
     int status = responseBody.value("status").toInt();
+    responseObj.reset();
+
+    return method == sentMethod && status == 200;
+}
+
+bool Client::getUserPhoto(QImage &photo) {
+    qDebug() << "here";
+    QJsonObject message;
+
+    QString sentMethod = "getUserPhoto";
+    QJsonObject requestObj =
+        getJsonRequestInstance(sentMethod, std::move(message));
+
+    sendRequest(requestObj);
+    if (responseObj->empty()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
+
+    QJsonObject responseMessage = responseBody.value("message").toObject();
+    QJsonObject content = responseMessage.value("content").toObject();
+    QString photoBase64 = content.value("image").toString();
+
+    photo = QImage::fromData(QByteArray::fromBase64(photoBase64.toUtf8()), "png");
+    if (m_debug) {
+        qDebug() << "Get image with size" << photo.size();
+    }
+
     responseObj.reset();
 
     return method == sentMethod && status == 200;

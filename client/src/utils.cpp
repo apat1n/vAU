@@ -1,4 +1,3 @@
-#include <chat.h>
 #include <QBuffer>
 #include <QDebug>
 #include <QDir>
@@ -9,6 +8,8 @@
 #include <QString>
 #include <algorithm>
 #include <vector>
+#include "chat.h"
+#include "client.h"
 
 [[nodiscard]] static bool isMatch(const QString &message,
                                   const QString &pattern) {
@@ -34,7 +35,7 @@
     return *std::max_element(z.begin(), z.end()) == pattern.size();
 }
 
-[[nodiscard]] static QString imageToBase64(QImage &image) {
+[[nodiscard]] static QString imageToBase64(const QImage &image) {
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
     image.save(&buffer,
@@ -59,8 +60,13 @@ static void clearListWidget(QListWidget *listWidget) {
     }
 }
 
-static QIcon getUserImage(int id) {
-    return QIcon();
+static QImage getUserImage(int id, Client &client) {
+    QImage photo;
+    if (!client.getUserPhoto(photo)) {
+        photo = QImage(256, 256, QImage::Format_RGB32);
+        photo.fill(Qt::blue);
+    }
+    return photo;
 }
 
 static void saveImage(const QImage &image, const QString &filename) {
