@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QListWidget>
+#include "client.h"
 namespace Ui {
 class Dialog;
 }
@@ -13,8 +14,11 @@ Q_SIGNALS:
     void requestCreating(QString name);
 
     void requestAddUser(int id);
+
 public:
-    explicit Dialog(QMap<int, QString> users_,QWidget *parent = nullptr);
+    explicit Dialog(Client &client,
+                    QMap<int, QString> users_,
+                    QWidget *parent = nullptr);
     ~Dialog();
 private slots:
     void on_createChat_clicked();
@@ -23,6 +27,7 @@ private slots:
 
 private:
     Ui::Dialog *ui;
+    Client &client;
 };
 
 #endif  // DIALOG_H

@@ -80,6 +80,10 @@ void Server::processBinaryMessage(QByteArray message) {
         proccessChatGetMessages(requestBody, pSender);
     } else if (requestMethod == "getUserList") {
         processGetUserList(requestBody, pSender);
+    } else if (requestMethod == "updateUserPhoto") {
+        processUpdateUserPhoto(requestBody, pSender);
+    } else if (requestMethod == "getUserPhoto") {
+        processGetUserPhoto(requestBody, pSender);
     }
 }
 
