@@ -1,7 +1,7 @@
+#include <QBuffer>
 #include <QDir>
 #include <QImage>
 #include "QJsonObject"
-#include <QBuffer>
 
 [[nodiscard]] static QString imageToBase64(const QImage &image) {
     QByteArray byteArray;

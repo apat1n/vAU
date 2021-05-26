@@ -3,8 +3,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
-#include <QProcessEnvironment>
 #include <QPixmap>
+#include <QProcessEnvironment>
 #include <QtCore/QDebug>
 #include "QtWebSockets/qwebsocket.h"
 #include "QtWebSockets/qwebsocketserver.h"
@@ -268,8 +268,7 @@ void Server::processUpdateUserPhoto(QJsonObject requestBody,
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
 
-void Server::processGetUserPhoto(QJsonObject requestBody,
-                                    QWebSocket *pSender) {
+void Server::processGetUserPhoto(QJsonObject requestBody, QWebSocket *pSender) {
     if (!isAuthorized(requestBody, pSender)) {
         return;
     }
@@ -293,8 +292,8 @@ void Server::processGetUserPhoto(QJsonObject requestBody,
     message["image"] = imageToBase64(photo);
 
     QString sentMethod = "updateUserPhoto";
-    QJsonObject responseObj =
-        getJsonResponseInstance(requestBody.value("method").toString(), std::move(message), 200);
+    QJsonObject responseObj = getJsonResponseInstance(
+        requestBody.value("method").toString(), std::move(message), 200);
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {

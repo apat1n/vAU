@@ -241,7 +241,8 @@ bool Client::getUserPhoto(QImage &photo) {
     QJsonObject content = responseMessage.value("content").toObject();
     QString photoBase64 = content.value("image").toString();
 
-    photo = QImage::fromData(QByteArray::fromBase64(photoBase64.toUtf8()), "png");
+    photo =
+        QImage::fromData(QByteArray::fromBase64(photoBase64.toUtf8()), "png");
     if (m_debug) {
         qDebug() << "Get image with size" << photo.size();
     }
