@@ -24,6 +24,7 @@ Q_SIGNALS:
     void closed();
     void responseRecieved();
     void connectionUnstable();
+    void responsePushMessageReceived(int chat_id);
 
 private Q_SLOTS:
     void onConnected();
@@ -44,7 +45,7 @@ public:
     bool logoutUser();
     // QJsonArray searchMessage(QString message, QString chatId);
     bool createChat(QString name);
-    bool getChatList(QList<Chat *> &chatList);
+    bool getChatList(QMap<int, Chat *> &chatList);
     bool getChatMessages(int chatId, QList<Message *> &messageHistory);
     bool getUserList(QMap<int, QString> &, int chatId = -1);
     void waitResponse();

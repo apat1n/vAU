@@ -73,7 +73,14 @@ void Client::onBinaryMessageReceived(QByteArray message) {
             .value("content")
             .toObject()
             .contains("push")) {
-        // emit signal
+        emit responsePushMessageReceived(responseObj->value("response")
+                                             .toObject()
+                                             .value("message")
+                                             .toObject()
+                                             .value("content")
+                                             .toObject()
+                                             .value("chat_id")
+                                             .toInt());
         qDebug() << "PUSHED!";
     }
     emit responseRecieved();

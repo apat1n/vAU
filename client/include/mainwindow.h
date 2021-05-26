@@ -43,15 +43,16 @@ private slots:
 
     void newChat(QString name);
 
+    void renderMessages(int chat_id);
+
 private:
     void onConnectionUnstable();
     void updateChats();
-    void renderChats(const QList<Chat *> &);
-    void renderMessages(Chat *);
+    void renderChats(const QMap<int, Chat *> &);
 
     Ui::MainWindow *ui;
     Client client;
-    QList<Chat *> availableChats;
+    QMap<int, Chat *> availableChats;
     QMap<int, QString> availibleUsers;
 };
 #endif  // MAINWINDOW_H

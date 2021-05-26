@@ -202,6 +202,8 @@ void Server::processSendMessageRequest(QJsonObject requestBody,
 
         QJsonObject message;
         message["push"] = 1;
+        message["chat_id"] = chat_id;
+
         responsePushObj = getJsonResponseInstance(
             requestBody.value("method").toString(), std::move(message), 200);
 

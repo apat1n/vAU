@@ -44,7 +44,7 @@ bool Client::createChat(QString name) {
     return method == sentMessage && status == 200;
 }
 
-bool Client::getChatList(QList<Chat *> &chatList) {
+bool Client::getChatList(QMap<int, Chat *> &chatList) {
     QString sentMethod = "getChatList";
     QJsonObject requestObj = getJsonRequestInstance(sentMethod);
     sendRequest(requestObj);
@@ -64,7 +64,7 @@ bool Client::getChatList(QList<Chat *> &chatList) {
         for (auto chatData : responseArray) {
             int id = chatData.toObject().value("id").toInt();
             QString name = chatData.toObject().value("name").toString();
-            chatList.append(new Chat(id, name));
+            chatList.insert(id, new Chat(id, name));
         }
     }
 

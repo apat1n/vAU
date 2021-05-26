@@ -16,6 +16,9 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
 
     connect(&client, &Client::connectionUnstable, this,
             &MainWindow::onConnectionUnstable);
+    connect(&client, &Client::responsePushMessageReceived,
+            [this](int chat_id) { renderMessages(chat_id); });
+
     ui->chatView->hide();
 }
 
@@ -85,7 +88,7 @@ void MainWindow::on_messageTextField_returnPressed() {
         if (Chat *chat = dynamic_cast<Chat *>(ui->chatMenu->currentItem());
             chat) {
             if (client.sendMessage(message, chat->getChatId())) {
-                renderMessages(chat);
+                renderMessages(chat->getChatId());
             }
         }
         ui->messageTextField->clear();
@@ -100,17 +103,25 @@ void MainWindow::on_search_textEdited(const QString &searchRequest) {
     }
 }
 
-void MainWindow::renderChats(const QList<Chat *> &chatsList) {
+void MainWindow::renderChats(const QMap<int, Chat *> &chatsList) {
     client.getUserList(availibleUsers);
     clearListWidget(ui->chatMenu);
-    for (auto it : chatsList) {
-        QListWidgetItem *item = it;
-        item->setText(it->getName());
-        ui->chatMenu->addItem(it);
+
+    for (QMap<int, Chat *>::const_iterator it = chatsList.constBegin();
+         it != chatsList.constEnd(); ++it) {
+        QListWidgetItem *item = it.value();
+        item->setText(it.value()->getName());
+        ui->chatMenu->addItem(it.value());
     }
 }
 
-void MainWindow::renderMessages(Chat *chat) {
+void MainWindow::renderMessages(int chat_id) {
+    if (!availableChats.contains(chat_id)) {
+        return;
+    }
+
+    Chat *chat = availableChats[chat_id];
+
     client.getUserList(availibleUsers);
     QList<Message *> newHistory;
     if (client.getChatMessages(chat->getChatId(), newHistory)) {
@@ -139,7 +150,7 @@ void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
     Chat *chat = dynamic_cast<Chat *>(item);
     if (chat) {
         ui->chatView->show();
-        renderMessages(chat);
+        renderMessages(chat->getChatId());
     }
 }
 
@@ -150,7 +161,7 @@ void MainWindow::newChat(QString name) {
 }
 
 void MainWindow::updateChats() {
-    QList<Chat *> newAvailableChats;
+    QMap<int, Chat *> newAvailableChats;
     if (client.getChatList(newAvailableChats)) {
         clearListWidget(ui->chatMenu);
         availableChats.clear();
