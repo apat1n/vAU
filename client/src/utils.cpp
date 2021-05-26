@@ -59,6 +59,10 @@ static void clearListWidget(QListWidget *listWidget) {
     }
 }
 
+static QIcon getUserImage(int id) {
+    return QIcon();
+}
+
 static void saveImage(const QImage &image, const QString &filename) {
     QDir dirPath = QDir::currentPath() + "/" + "images";
     if (!dirPath.exists()) {

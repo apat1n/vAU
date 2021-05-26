@@ -43,6 +43,8 @@ private slots:
 
     void newChat(QString name);
 
+    void inviteUser(int id);
+    //todo: потом сделать этот метод или что-нибудь в этом роде) и кстати у чатов тоже кажется должен быть свой Id..
 private:
     void onConnectionUnstable();
     void updateChats();
