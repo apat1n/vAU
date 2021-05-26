@@ -7,11 +7,11 @@ namespace Ui {
 class Dialog;
 }
 
-class Dialog : public QDialog
-{
+class Dialog : public QDialog {
     Q_OBJECT
 Q_SIGNALS:
     void requestCreating(QString name);
+
 public:
     explicit Dialog(QWidget *parent = nullptr);
     ~Dialog();
@@ -23,4 +23,4 @@ private:
     Ui::Dialog *ui;
 };
 
-#endif // DIALOG_H
+#endif  // DIALOG_H

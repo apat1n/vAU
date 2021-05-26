@@ -30,6 +30,8 @@ void Server::processLoginRequest(QJsonObject requestBody, QWebSocket *pSender) {
     QJsonObject responseObj;
     if (authUser(user, password)) {
         authenticatedUsers[pSender] = user;
+        authenticatedUsersId[user.id] = pSender;
+
         QJsonObject content;
         content["id"] = user.id;
         responseObj = getJsonResponseInstance(
@@ -57,6 +59,7 @@ void Server::processRegisterRequest(QJsonObject requestBody,
         User user = User({-1, login, pSender});
         authUser(user, password);
         authenticatedUsers[pSender] = user;
+        authenticatedUsersId[user.id] = pSender;
 
         QJsonObject content;
         content["id"] =
@@ -78,6 +81,7 @@ void Server::processRegisterRequest(QJsonObject requestBody,
 void Server::processLogoutRequest(QJsonObject requestBody,
                                   QWebSocket *pSender) {
     if (!authenticatedUsers.contains(pSender)) {
+        authenticatedUsersId.remove(authenticatedUsers[pSender].id);
         authenticatedUsers.remove(pSender);
     }
 
@@ -203,7 +207,15 @@ void Server::processSendMessageRequest(QJsonObject requestBody,
     if (m_debug) {
         qDebug() << "response" << responseBinaryMessage;
     }
-    pSender->sendBinaryMessage(responseBinaryMessage);
+
+    QMap<int, QString> userList = getUserList(chat_id);
+    for (QMap<int, QString>::iterator user_it = userList.begin();
+         user_it != userList.end(); ++user_it) {
+        qDebug() << user_it.key();
+        if (authenticatedUsersId.contains(user_it.key()))
+            authenticatedUsersId[user_it.key()]->sendBinaryMessage(
+                responseBinaryMessage);
+    }
 }
 
 void Server::processGetUserList(QJsonObject requestBody, QWebSocket *pSender) {
@@ -212,9 +224,12 @@ void Server::processGetUserList(QJsonObject requestBody, QWebSocket *pSender) {
     }
     // if user in chat
 
+    int chatId =
+        requestBody.value("message").toObject().value("chatId").toInt();
+
     QJsonArray contentArray;
     /* Filling contentArray */ {
-        QMap<int, QString> userList = getUserList();
+        QMap<int, QString> userList = getUserList(chatId);
         QMap<int, QString>::iterator user_it;
         for (user_it = userList.begin(); user_it != userList.end(); ++user_it) {
             QJsonObject chatItem;

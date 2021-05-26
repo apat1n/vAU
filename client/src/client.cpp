@@ -66,6 +66,7 @@ void Client::onBinaryMessageReceived(QByteArray message) {
     }
 
     responseObj = QJsonDocument::fromJson(message).object();
+
     emit responseRecieved();
 }
 

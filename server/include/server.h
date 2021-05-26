@@ -34,6 +34,8 @@ private:
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
     QMap<QWebSocket *, User> authenticatedUsers;
+    QMap<int, QWebSocket *> authenticatedUsersId;
+
     QSqlDatabase db;
     bool m_debug;
 
@@ -53,7 +55,7 @@ private:
     bool createChat(QString, int);
     QList<Chat> getChatList(User &);
     QList<Message> getMessageList(int chatId);
-    QMap<int, QString> getUserList();
+    QMap<int, QString> getUserList(int chatId = -1);
 
     bool createMessage(int, int, QString, QDate);
 };

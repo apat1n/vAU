@@ -167,9 +167,13 @@ bool Client::registerUser(QString login, QString password) {
     return method == sentMessage && status == 200;
 }
 
-bool Client::getUserList(QMap<int, QString> &userList) {
+bool Client::getUserList(QMap<int, QString> &userList, int chatId) {
+    QJsonObject message;
+    message["chatId"] = chatId;
     QString sentMethod = "getUserList";
-    QJsonObject requestObj = getJsonRequestInstance(sentMethod);
+    QJsonObject requestObj =
+        getJsonRequestInstance(sentMethod, std::move(message));
+
     sendRequest(requestObj);
 
     if (responseObj->empty()) {

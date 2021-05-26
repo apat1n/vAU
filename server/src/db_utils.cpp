@@ -128,10 +128,16 @@ bool Server::createMessage(int chat_id,
     return query.exec(QString::fromStdString(ss.str()));
 }
 
-QMap<int, QString> Server::getUserList() {
+QMap<int, QString> Server::getUserList(int chatId) {
     QSqlQuery query(db);
     std::stringstream ss;
-    ss << "SELECT id, login FROM quser;";
+    if (chatId == -1) {
+        ss << "SELECT id, login FROM quser;";
+    } else {
+        ss << "SELECT id, login FROM qchatuserlist JOIN quser ON quser.id = "
+              "qchatuserlist.user_id WHERE chat_id = "
+           << chatId << ";";
+    }
 
     if (m_debug) {
         qDebug() << QString::fromStdString(ss.str());
