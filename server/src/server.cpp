@@ -3,7 +3,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
-#include <QProcessEnvironment>
 #include <QtCore/QDebug>
 #include "QtWebSockets/qwebsocket.h"
 #include "QtWebSockets/qwebsocketserver.h"
@@ -15,7 +14,14 @@ Server::Server(quint16 port, bool debug, QObject *parent)
       m_pWebSocketServer(new QWebSocketServer(QStringLiteral("Server"),
                                               QWebSocketServer::NonSecureMode,
                                               this)),
-      m_debug(debug) {
+      m_debug(debug),
+      env(QProcessEnvironment::systemEnvironment()),
+      db(env.value("DBURL"),
+         env.value("DBPORT").toInt(),
+         env.value("DBNAME"),
+         env.value("DBUSERNAME"),
+         env.value("DBPASSWORD"),
+         m_debug) {
     if (m_pWebSocketServer->listen(QHostAddress::Any, port)) {
         if (m_debug)
             qDebug() << "Server listening on port" << port;
@@ -24,21 +30,6 @@ Server::Server(quint16 port, bool debug, QObject *parent)
         connect(m_pWebSocketServer, &QWebSocketServer::closed, this,
                 &Server::closed);
     }
-
-    // make SQL connection
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    db = QSqlDatabase::addDatabase("QPSQL");
-
-    db.setHostName(env.value("DBURL"));
-    db.setPort(env.value("DBPORT").toInt());
-    db.setDatabaseName(env.value("DBNAME"));
-    db.setUserName(env.value("DBUSERNAME"));
-    db.setPassword(env.value("DBPASSWORD"));
-
-    if (m_debug) {
-        qDebug() << "SQL connection: " << (db.open() ? "opened" : "closed");
-    }
-
     // set English localization for dates
     QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
 }
@@ -89,6 +80,10 @@ void Server::processBinaryMessage(QByteArray message) {
         proccessChatGetMessages(requestBody, pSender);
     } else if (requestMethod == "getUserList") {
         processGetUserList(requestBody, pSender);
+    } else if (requestMethod == "updateUserPhoto") {
+        processUpdateUserPhoto(requestBody, pSender);
+    } else if (requestMethod == "getUserPhoto") {
+        processGetUserPhoto(requestBody, pSender);
     }
 }
 

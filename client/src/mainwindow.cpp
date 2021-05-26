@@ -145,25 +145,25 @@ void MainWindow::updateChats() {
     renderChats(availableChats);
 }
 
-void MainWindow::inviteUser(int id){
+void MainWindow::inviteUser(int id) {
     qDebug() << id;
 }
 
-void MainWindow::on_actionDark_Theme_triggered(){
-    if(ui->actionDark_Theme->isChecked()){
+void MainWindow::on_actionDark_Theme_triggered() {
+    if (ui->actionDark_Theme->isChecked()) {
         QFile file("/home/vtgcon/Загрузки/style.qss");
-            file.open(QFile::ReadOnly);
-            QString styleSheet = QLatin1String(file.readAll());
-            qApp->setStyleSheet(styleSheet);
-    }else{
+        file.open(QFile::ReadOnly);
+        QString styleSheet = QLatin1String(file.readAll());
+        qApp->setStyleSheet(styleSheet);
+    } else {
         QFile file("/home/vtgcon/Загрузки/style0.qss");
-            file.open(QFile::ReadOnly);
-            QString styleSheet = QLatin1String(file.readAll());
-            qApp->setStyleSheet(styleSheet);
+        file.open(QFile::ReadOnly);
+        QString styleSheet = QLatin1String(file.readAll());
+        qApp->setStyleSheet(styleSheet);
     }
 }
 
-void MainWindow::on_actionLog_Out_triggered(){
+void MainWindow::on_actionLog_Out_triggered() {
     if (client.logoutUser()) {
         ui->stackedWidget->setCurrentIndex(0);
     }
@@ -173,9 +173,10 @@ void MainWindow::on_actionLog_Out_triggered(){
 void MainWindow::on_createChatButton_clicked() {
     QMap<int, QString> users;
     client.getUserList(users);
-    Dialog creating(users);
+    Dialog creating(client, users);
 
-    connect(&creating, SIGNAL(requestAddUser(int)), this, SLOT(inviteUser(int)));
+    connect(&creating, SIGNAL(requestAddUser(int)), this,
+            SLOT(inviteUser(int)));
     connect(&creating, SIGNAL(requestCreating(const QString &)), this,
             SLOT(newChat(const QString &)));
 
