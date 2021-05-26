@@ -10,12 +10,14 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->setupUi(this);
     ui->errorLogin->hide();
     ui->errorRegister->hide();
-    ui->labelUnstableConnection->hide();
     client.connectServer();
+    QFile file("/home/vtgcon/Загрузки/style0.qss");
+    file.open(QFile::ReadOnly);
+    QString styleSheet = QLatin1String(file.readAll());
+    qApp->setStyleSheet(styleSheet);
     ui->inputPassword->setEchoMode(QLineEdit::Password);
-
-    connect(&client, &Client::connectionUnstable, this,
-            &MainWindow::onConnectionUnstable);
+    ui->stackedWidget->setCurrentIndex(0);
+    ui->menuLog_Out->menuAction()->setVisible(false);
     ui->chatView->hide();
 }
 
@@ -23,24 +25,13 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::onConnectionUnstable() {
-    ui->labelUnstableConnection->show();
-}
-
-void MainWindow::on_SendButton_clicked() {
-    if (!ui->inputText->document()->isEmpty()) {
-        QString inputText = ui->inputText->toPlainText();
-        // client.sendMessage(inputText);
-        ui->inputText->clear();
-    }
-}
-
 void MainWindow::on_signIn_clicked() {
     QString login = ui->inputLogin->text();
     QString password = ui->inputPassword->text();
 
     if (client.loginUser(login, password)) {
-        ui->stackedWidget->setCurrentIndex(2);
+        ui->stackedWidget->setCurrentIndex(1);
+        ui->menuLog_Out->menuAction()->setVisible(true);
         updateChats();
         ui->errorLogin->hide();
     } else {
@@ -49,19 +40,14 @@ void MainWindow::on_signIn_clicked() {
     ui->inputPassword->clear();
 }
 
-void MainWindow::on_signOut_clicked() {
-    if (client.logoutUser()) {
-        ui->stackedWidget->setCurrentIndex(0);
-    }
-}
-
 void MainWindow::on_registerButton_clicked() {
     QString login = ui->inputLogin->text();
     QString password = ui->inputPassword->text();
 
     if (client.registerUser(login, password)) {
-        ui->stackedWidget->setCurrentIndex(2);
+        ui->menuLog_Out->menuAction()->setVisible(true);
         updateChats();
+        ui->stackedWidget->setCurrentIndex(1);
         ui->errorRegister->hide();
     } else {
         ui->errorRegister->show();
@@ -163,10 +149,32 @@ void MainWindow::inviteUser(int id){
     qDebug() << id;
 }
 
+void MainWindow::on_actionDark_Theme_triggered(){
+    if(ui->actionDark_Theme->isChecked()){
+        QFile file("/home/vtgcon/Загрузки/style.qss");
+            file.open(QFile::ReadOnly);
+            QString styleSheet = QLatin1String(file.readAll());
+            qApp->setStyleSheet(styleSheet);
+    }else{
+        QFile file("/home/vtgcon/Загрузки/style0.qss");
+            file.open(QFile::ReadOnly);
+            QString styleSheet = QLatin1String(file.readAll());
+            qApp->setStyleSheet(styleSheet);
+    }
+}
+
+void MainWindow::on_actionLog_Out_triggered(){
+    if (client.logoutUser()) {
+        ui->stackedWidget->setCurrentIndex(0);
+    }
+    ui->menuLog_Out->menuAction()->setVisible(false);
+}
+
 void MainWindow::on_createChatButton_clicked() {
     QMap<int, QString> users;
     client.getUserList(users);
     Dialog creating(users);
+
     connect(&creating, SIGNAL(requestAddUser(int)), this, SLOT(inviteUser(int)));
     connect(&creating, SIGNAL(requestCreating(const QString &)), this,
             SLOT(newChat(const QString &)));

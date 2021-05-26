@@ -21,17 +21,14 @@ public:
 
 Q_SIGNALS:
     void connectionUnstable();
-private slots:
 
-    void on_SendButton_clicked();
+private slots:
 
     void on_signIn_clicked();
 
     void on_pushButton_2_clicked();
 
     void on_registerButton_clicked();
-
-    void on_signOut_clicked();
 
     void on_messageTextField_returnPressed();
 
@@ -42,6 +39,10 @@ private slots:
     void on_createChatButton_clicked();
 
     void newChat(QString name);
+
+    void on_actionDark_Theme_triggered();
+
+    void on_actionLog_Out_triggered();
 
     void inviteUser(int id);
     //todo: потом сделать этот метод или что-нибудь в этом роде) и кстати у чатов тоже кажется должен быть свой Id..

@@ -7,6 +7,7 @@
 Dialog::Dialog(QMap<int,QString> users_, QWidget *parent) : QDialog(parent), ui(new Ui::Dialog){
 
     ui->setupUi(this);
+    ui->avaliableUsers->setIconSize(QSize(64,64));
     QMap<int, QString>::iterator i;
     for (i=users_.begin();i!=users_.end();i++){
         QListWidgetItem *it = new QListWidgetItem;

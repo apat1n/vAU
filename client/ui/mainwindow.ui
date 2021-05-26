@@ -6,215 +6,196 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>767</width>
+    <height>555</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QStackedWidget" name="stackedWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>801</width>
-      <height>581</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true"/>
-    </property>
-    <property name="currentIndex">
-     <number>0</number>
-    </property>
-    <widget class="QWidget" name="authorization">
-     <widget class="QWidget" name="verticalLayoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>270</x>
-        <y>160</y>
-        <width>258</width>
-        <height>339</height>
-       </rect>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <widget class="QStackedWidget" name="stackedWidget">
+      <property name="styleSheet">
+       <string notr="true"/>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item alignment="Qt::AlignHCenter">
-        <widget class="QLabel" name="labelLogin">
-         <property name="text">
-          <string>Login</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="inputLogin"/>
-       </item>
-       <item alignment="Qt::AlignHCenter">
-        <widget class="QLabel" name="labelPassword">
-         <property name="text">
-          <string>Password</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="inputPassword"/>
-       </item>
-       <item alignment="Qt::AlignHCenter">
-        <widget class="QLabel" name="errorLogin">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: rgb(239, 41, 41);</string>
-         </property>
-         <property name="text">
-          <string>Incorrect user</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="signIn">
-         <property name="text">
-          <string>Sign in</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="registerButton">
-         <property name="text">
-          <string>Register</string>
-         </property>
-        </widget>
-       </item>
-       <item alignment="Qt::AlignHCenter">
-        <widget class="QLabel" name="errorRegister">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: rgb(239, 41, 41);</string>
-         </property>
-         <property name="text">
-          <string>This user already exists</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="authorization">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item alignment="Qt::AlignHCenter">
+           <widget class="QLabel" name="labelLogin">
+            <property name="text">
+             <string>Login</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="inputLogin"/>
+          </item>
+          <item alignment="Qt::AlignHCenter">
+           <widget class="QLabel" name="labelPassword">
+            <property name="text">
+             <string>Password</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="inputPassword"/>
+          </item>
+          <item alignment="Qt::AlignHCenter">
+           <widget class="QLabel" name="errorLogin">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(239, 41, 41);</string>
+            </property>
+            <property name="text">
+             <string>Incorrect user</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="signIn">
+            <property name="text">
+             <string>Sign in</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="registerButton">
+            <property name="text">
+             <string>Register</string>
+            </property>
+           </widget>
+          </item>
+          <item alignment="Qt::AlignHCenter">
+           <widget class="QLabel" name="errorRegister">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">background-color: rgb(239, 41, 41);</string>
+            </property>
+            <property name="text">
+             <string>This user already exists</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="page">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="3" column="4">
+           <widget class="QLineEdit" name="messageTextField"/>
+          </item>
+          <item row="0" column="4" rowspan="3">
+           <widget class="QListWidget" name="chatView"/>
+          </item>
+          <item row="0" column="3" rowspan="4">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QLineEdit" name="search"/>
+            </item>
+            <item>
+             <widget class="QListWidget" name="chatMenu">
+              <property name="maximumSize">
+               <size>
+                <width>362</width>
+                <height>16777215</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="createChatButton">
+              <property name="text">
+               <string>Create a new chat</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
-    </widget>
-    <widget class="QWidget" name="chat">
-     <property name="palette">
-      <palette>
-       <active/>
-       <inactive/>
-       <disabled/>
-      </palette>
-     </property>
-     <widget class="QWidget" name="horizontalLayoutWidget_2">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>380</y>
-        <width>421</width>
-        <height>86</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QPushButton" name="signOut">
-         <property name="styleSheet">
-          <string notr="true">background-color: rgb(239, 41, 41);</string>
-         </property>
-         <property name="text">
-          <string>log out</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTextEdit" name="inputText"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="SendButton">
-         <property name="styleSheet">
-          <string notr="true">background-color: rgb(252, 175, 62);</string>
-         </property>
-         <property name="text">
-          <string>Send</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QTextBrowser" name="debugText">
-      <property name="geometry">
-       <rect>
-        <x>190</x>
-        <y>120</y>
-        <width>421</width>
-        <height>211</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="labelUnstableConnection">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>550</y>
-        <width>131</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Unstable connection..</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="page">
-     <widget class="QWidget" name="gridLayoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>10</y>
-        <width>731</width>
-        <height>561</height>
-       </rect>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QLineEdit" name="search"/>
-       </item>
-       <item row="0" column="1" rowspan="2">
-        <widget class="QListWidget" name="chatView"/>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="messageTextField"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QListWidget" name="chatMenu"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QPushButton" name="createChatButton">
-         <property name="text">
-          <string>Create a new chat</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>767</width>
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <addaction name="actionDark_Theme"/>
+   </widget>
+   <widget class="QMenu" name="menuLog_Out">
+    <property name="title">
+     <string>User</string>
+    </property>
+    <addaction name="actionLog_Out"/>
+   </widget>
+   <addaction name="menuSettings"/>
+   <addaction name="menuLog_Out"/>
   </widget>
+  <action name="actionDark_Theme">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Dark Theme</string>
+   </property>
+  </action>
+  <action name="actionLog_Out">
+   <property name="text">
+    <string>Log Out</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

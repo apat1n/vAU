@@ -51,7 +51,9 @@ static void clearListWidget(QListWidget *listWidget) {
 }
 
 static QIcon getUserImage(int id) {
-    return QIcon();
+    QPixmap pixmap(1000,1000);
+    pixmap.fill(Qt::red);
+    return QIcon(pixmap);
 }
 
 static void saveImage(const QImage &image, const QString &filename) {
