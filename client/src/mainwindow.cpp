@@ -127,7 +127,6 @@ void MainWindow::renderMessages(int chat_id) {
     if (client.getChatMessages(chat->getChatId(), newHistory)) {
         clearListWidget(ui->chatView);
         chat->updateMessageHistory(std::move(newHistory));
-        qDebug() << "Got " << chat->getHistory().size() << " messages!";
         for (auto it : chat->getHistory()) {
             if (it) {
                 if (QListWidgetItem *widgetElem =
@@ -136,7 +135,6 @@ void MainWindow::renderMessages(int chat_id) {
                     QString textField = "[ " +
                                         availibleUsers[it->getAuthorId()] +
                                         " ] : " + it->getText();
-                    qDebug() << textField;
                     widgetElem->setText(textField);
                     ui->chatView->addItem(widgetElem);
                 }

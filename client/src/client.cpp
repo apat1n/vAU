@@ -62,7 +62,7 @@ void Client::onConnected() {
 
 void Client::onBinaryMessageReceived(QByteArray message) {
     if (m_debug) {
-        qDebug() << message;
+        qDebug("Sent request: %s", qUtf8Printable(message));
     }
 
     responseObj = QJsonDocument::fromJson(message).object();
@@ -81,7 +81,6 @@ void Client::onBinaryMessageReceived(QByteArray message) {
                                              .toObject()
                                              .value("chat_id")
                                              .toInt());
-        qDebug() << "PUSHED!";
     }
     emit responseRecieved();
 }
@@ -123,7 +122,7 @@ void Client::sendRequest(const QJsonObject &requestObj) {
     QByteArray requestBinaryMessage = QJsonDocument(requestObj).toJson();
 
     if (m_debug) {
-        qDebug() << requestBinaryMessage;
+        qDebug("Sent request: %s", qUtf8Printable(requestBinaryMessage));
     }
 
     m_webSocket.sendBinaryMessage(requestBinaryMessage);

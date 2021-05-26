@@ -191,10 +191,6 @@ bool Client::getUserList(QMap<int, QString> &userList, int chatId) {
         int user_id = user_it.toObject().value("user_id").toInt();
         QString user_name = user_it.toObject().value("user_name").toString();
 
-        if (m_debug) {
-            qDebug() << user_id << " " << user_name;
-        }
-
         userList[user_id] = user_name;
     }
 
