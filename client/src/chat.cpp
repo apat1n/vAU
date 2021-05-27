@@ -3,7 +3,7 @@
 Chat::Chat(int chatId, const QString name_) : chatId(chatId), name(name_) {
 }
 
-[[nodiscard]] QList<QSharedPointer<Message>> Chat::getHistory() const {
+[[nodiscard]] QList<QSharedPointer<Message>> &Chat::getHistory() {
     return message_history;
 }
 

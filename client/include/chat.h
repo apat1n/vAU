@@ -15,7 +15,7 @@ private:
 
 public:
     Chat(int, const QString);
-    [[nodiscard]] QList<QSharedPointer<Message>> getHistory() const;
+    [[nodiscard]] QList<QSharedPointer<Message>> &getHistory();
     [[nodiscard]] QString getName() const;
     [[nodiscard]] int getChatId() const;
     void updateMessageHistory(QList<QSharedPointer<Message>> &);
