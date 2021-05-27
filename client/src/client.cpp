@@ -65,15 +65,16 @@ void Client::onBinaryMessageReceived(QByteArray message) {
         qDebug("Sent request: %s", qUtf8Printable(message));
     }
 
-    responseObj = QJsonDocument::fromJson(message).object();
-    if (responseObj->value("response")
+    QJsonObject messageJson = QJsonDocument::fromJson(message).object();
+    if (messageJson.value("response")
             .toObject()
             .value("message")
             .toObject()
             .value("content")
             .toObject()
             .contains("push")) {
-        emit responsePushMessageReceived(responseObj->value("response")
+        //        pushObj = messageJson;
+        emit responsePushMessageReceived(messageJson.value("response")
                                              .toObject()
                                              .value("message")
                                              .toObject()
@@ -81,8 +82,10 @@ void Client::onBinaryMessageReceived(QByteArray message) {
                                              .toObject()
                                              .value("chat_id")
                                              .toInt());
+    } else {
+        responseObj = messageJson;
+        emit responseRecieved();
     }
-    emit responseRecieved();
 }
 
 void Client::onWebcocketStateChanged() {

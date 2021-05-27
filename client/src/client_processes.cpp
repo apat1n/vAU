@@ -3,6 +3,7 @@
 #include "utils.cpp"
 
 bool Client::sendMessage(Message *messageObj, int chatId) {
+    Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["content"] = messageObj->getText();
     message["chatId"] = chatId;
@@ -12,7 +13,7 @@ bool Client::sendMessage(Message *messageObj, int chatId) {
         getJsonRequestInstance(sentMessage, std::move(message));
 
     sendRequest(requestObj);
-    if (responseObj->empty()) {
+    if (!responseObj.has_value()) {
         return false;
     }
 
@@ -25,6 +26,7 @@ bool Client::sendMessage(Message *messageObj, int chatId) {
 }
 
 bool Client::createChat(QString name) {
+    Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["name"] = name;
 
@@ -32,7 +34,7 @@ bool Client::createChat(QString name) {
     QJsonObject requestObj =
         getJsonRequestInstance(sentMessage, std::move(message));
     sendRequest(requestObj);
-    if (responseObj->empty()) {
+    if (!responseObj.has_value()) {
         return false;
     }
 
@@ -45,11 +47,12 @@ bool Client::createChat(QString name) {
 }
 
 bool Client::getChatList(QMap<int, Chat *> &chatList) {
+    Q_ASSERT(!responseObj.has_value());
     QString sentMethod = "getChatList";
     QJsonObject requestObj = getJsonRequestInstance(sentMethod);
     sendRequest(requestObj);
 
-    if (responseObj->empty()) {
+    if (!responseObj.has_value()) {
         return false;
     }
 
@@ -72,6 +75,7 @@ bool Client::getChatList(QMap<int, Chat *> &chatList) {
 }
 
 bool Client::getChatMessages(int chatId, QList<Message *> &messageHistory) {
+    Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["chat_id"] = chatId;
 
@@ -80,7 +84,7 @@ bool Client::getChatMessages(int chatId, QList<Message *> &messageHistory) {
         getJsonRequestInstance(sentMethod, std::move(message));
 
     sendRequest(requestObj);
-    if (responseObj->empty()) {
+    if (!responseObj.has_value()) {
         return false;
     }
 
@@ -104,11 +108,12 @@ bool Client::getChatMessages(int chatId, QList<Message *> &messageHistory) {
 }
 
 bool Client::logoutUser() {
+    Q_ASSERT(!responseObj.has_value());
     QString sentMethod = "logout";
     QJsonObject requestObj = getJsonRequestInstance(sentMethod);
 
     sendRequest(requestObj);
-    if (responseObj->empty()) {
+    if (!responseObj.has_value()) {
         return false;
     }
 
@@ -121,6 +126,7 @@ bool Client::logoutUser() {
 }
 
 bool Client::loginUser(QString login, QString password) {
+    Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["login"] = login;
     message["password"] = password;
@@ -130,7 +136,7 @@ bool Client::loginUser(QString login, QString password) {
         getJsonRequestInstance(sentMessage, std::move(message));
 
     sendRequest(requestObj);
-    if (responseObj->empty()) {
+    if (!responseObj.has_value()) {
         return false;
     }
 
@@ -144,6 +150,7 @@ bool Client::loginUser(QString login, QString password) {
 }
 
 bool Client::registerUser(QString login, QString password) {
+    Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["login"] = login;
     message["password"] = password;
@@ -153,7 +160,7 @@ bool Client::registerUser(QString login, QString password) {
         getJsonRequestInstance(sentMessage, std::move(message));
 
     sendRequest(requestObj);
-    if (responseObj->empty()) {
+    if (!responseObj.has_value()) {
         return false;
     }
 
@@ -168,6 +175,7 @@ bool Client::registerUser(QString login, QString password) {
 }
 
 bool Client::getUserList(QMap<int, QString> &userList, int chatId) {
+    Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["chatId"] = chatId;
     QString sentMethod = "getUserList";
@@ -176,7 +184,7 @@ bool Client::getUserList(QMap<int, QString> &userList, int chatId) {
 
     sendRequest(requestObj);
 
-    if (responseObj->empty()) {
+    if (!responseObj.has_value()) {
         return false;
     }
 
