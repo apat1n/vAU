@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <iostream>
+#include <memory>
 #include <utility>
 #include "createChat.h"
 #include "ui_mainwindow.h"
@@ -80,8 +81,9 @@ void MainWindow::on_messageTextField_returnPressed() {
 
     if (!messageText.isEmpty()) {
         // Creating message
-        Message *message = new Message(messageText, client.getId());
-        message->setText(messageText);
+        Message *raw_message = new Message(messageText, client.getId());
+        raw_message->setText(messageText);
+        QSharedPointer<Message> message(raw_message);
         //
 
         // Sending to db and adding to listview
@@ -103,15 +105,16 @@ void MainWindow::on_search_textEdited(const QString &searchRequest) {
     }
 }
 
-void MainWindow::renderChats(const QMap<int, Chat *> &chatsList) {
+void MainWindow::renderChats(const QMap<int, QSharedPointer<Chat>> &chatsList) {
     client.getUserList(availibleUsers);
     clearListWidget(ui->chatMenu);
 
-    for (QMap<int, Chat *>::const_iterator it = chatsList.constBegin();
+    for (QMap<int, QSharedPointer<Chat>>::const_iterator it =
+             chatsList.constBegin();
          it != chatsList.constEnd(); ++it) {
-        QListWidgetItem *item = it.value();
+        QListWidgetItem *item = it.value().get();
         item->setText(it.value()->getName());
-        ui->chatMenu->addItem(it.value());
+        ui->chatMenu->addItem(it.value().get());
     }
 }
 
@@ -120,21 +123,24 @@ void MainWindow::renderMessages(int chat_id) {
         return;
     }
 
-    Chat *chat = availableChats[chat_id];
+    Chat *chat = availableChats[chat_id].get();
 
     client.getUserList(availibleUsers);
-    QList<Message *> newHistory;
+    QList<QSharedPointer<Message>> newHistory;
     if (client.getChatMessages(chat->getChatId(), newHistory)) {
         clearListWidget(ui->chatView);
-        chat->updateMessageHistory(std::move(newHistory));
-        for (auto it : chat->getHistory()) {
-            if (it) {
+        chat->updateMessageHistory(newHistory);
+
+        for (QList<QSharedPointer<Message>>::iterator it =
+                 chat->getHistory().begin();
+             it != chat->getHistory().end(); ++it) {
+            if (it->get()) {
                 if (QListWidgetItem *widgetElem =
-                        dynamic_cast<QListWidgetItem *>(it);
+                        dynamic_cast<QListWidgetItem *>(it->get());
                     widgetElem) {
-                    QString textField = "[ " +
-                                        availibleUsers[it->getAuthorId()] +
-                                        " ] : " + it->getText();
+                    QString textField =
+                        "[ " + availibleUsers[it->get()->getAuthorId()] +
+                        " ] : " + it->get()->getText();
                     widgetElem->setText(textField);
                     ui->chatView->addItem(widgetElem);
                 }
@@ -159,7 +165,7 @@ void MainWindow::newChat(QString name) {
 }
 
 void MainWindow::updateChats() {
-    QMap<int, Chat *> newAvailableChats;
+    QMap<int, QSharedPointer<Chat>> newAvailableChats;
     if (client.getChatList(newAvailableChats)) {
         clearListWidget(ui->chatMenu);
         availableChats.clear();

@@ -9,6 +9,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QObject>
 #include <QtWebSockets/QWebSocket>
+#include <memory>
 #include <optional>
 
 class Client : public QObject {
@@ -41,12 +42,13 @@ private:
 
 public:
     int getId() const;
-    bool sendMessage(Message *, int);
+    bool sendMessage(const QSharedPointer<Message> &, int);
     bool logoutUser();
     // QJsonArray searchMessage(QString message, QString chatId);
     bool createChat(QString name);
-    bool getChatList(QMap<int, Chat *> &chatList);
-    bool getChatMessages(int chatId, QList<Message *> &messageHistory);
+    bool getChatList(QMap<int, QSharedPointer<Chat>> &chatList);
+    bool getChatMessages(int chatId,
+                         QList<QSharedPointer<Message>> &messageHistory);
     bool getUserList(QMap<int, QString> &, int chatId = -1);
     void waitResponse();
     void sendRequest(const QJsonObject &requestObj);

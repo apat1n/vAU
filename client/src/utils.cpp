@@ -33,11 +33,12 @@
     return *std::max_element(z.begin(), z.end()) == pattern.size();
 }
 
-[[nodiscard]] static QMap<int, Chat *> foundMatches(
-    const QMap<int, Chat *> &input,
+[[nodiscard]] static QMap<int, QSharedPointer<Chat>> foundMatches(
+    const QMap<int, QSharedPointer<Chat>> &input,
     const QString &pattern) {
-    QMap<int, Chat *> result;
-    for (QMap<int, Chat *>::const_iterator chat = input.constBegin();
+    QMap<int, QSharedPointer<Chat>> result;
+    for (QMap<int, QSharedPointer<Chat>>::const_iterator chat =
+             input.constBegin();
          chat != input.constEnd(); ++chat) {
         if (isMatch(chat.value()->getName(), pattern)) {
             result.insert(chat.key(), chat.value());

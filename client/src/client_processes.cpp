@@ -2,7 +2,8 @@
 #include "client.h"
 #include "utils.cpp"
 
-bool Client::sendMessage(Message *messageObj, int chatId) {
+bool Client::sendMessage(const QSharedPointer<Message> &messageObj,
+                         int chatId) {
     Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["content"] = messageObj->getText();
@@ -46,7 +47,7 @@ bool Client::createChat(QString name) {
     return method == sentMessage && status == 200;
 }
 
-bool Client::getChatList(QMap<int, Chat *> &chatList) {
+bool Client::getChatList(QMap<int, QSharedPointer<Chat>> &chatList) {
     Q_ASSERT(!responseObj.has_value());
     QString sentMethod = "getChatList";
     QJsonObject requestObj = getJsonRequestInstance(sentMethod);
@@ -67,14 +68,15 @@ bool Client::getChatList(QMap<int, Chat *> &chatList) {
         for (auto chatData : responseArray) {
             int id = chatData.toObject().value("id").toInt();
             QString name = chatData.toObject().value("name").toString();
-            chatList.insert(id, new Chat(id, name));
+            chatList.insert(id, QSharedPointer<Chat>(new Chat(id, name)));
         }
     }
 
     return method == sentMethod && status == 200;
 }
 
-bool Client::getChatMessages(int chatId, QList<Message *> &messageHistory) {
+bool Client::getChatMessages(int chatId,
+                             QList<QSharedPointer<Message>> &messageHistory) {
     Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["chat_id"] = chatId;
@@ -100,7 +102,8 @@ bool Client::getChatMessages(int chatId, QList<Message *> &messageHistory) {
             int id = responseMessage.toObject().value("id").toInt();
             QString messageText =
                 responseMessage.toObject().value("message_text").toString();
-            messageHistory.append(new Message(messageText, id));
+            messageHistory.append(
+                QSharedPointer<Message>(new Message(messageText, id)));
         }
     }
 

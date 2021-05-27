@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <memory>
 #include "chat.h"
 #include "client.h"
 #include "message.h"
@@ -48,11 +49,11 @@ private slots:
 private:
     void onConnectionUnstable();
     void updateChats();
-    void renderChats(const QMap<int, Chat *> &);
+    void renderChats(const QMap<int, QSharedPointer<Chat>> &);
 
     Ui::MainWindow *ui;
     Client client;
-    QMap<int, Chat *> availableChats;
+    QMap<int, QSharedPointer<Chat>> availableChats;
     QMap<int, QString> availibleUsers;
 };
 #endif  // MAINWINDOW_H
