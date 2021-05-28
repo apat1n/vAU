@@ -62,11 +62,30 @@ void Client::onConnected() {
 
 void Client::onBinaryMessageReceived(QByteArray message) {
     if (m_debug) {
-        qDebug() << message;
+        qDebug("Sent request: %s", qUtf8Printable(message));
     }
 
-    responseObj = QJsonDocument::fromJson(message).object();
-    emit responseRecieved();
+    QJsonObject messageJson = QJsonDocument::fromJson(message).object();
+    if (messageJson.value("response")
+            .toObject()
+            .value("message")
+            .toObject()
+            .value("content")
+            .toObject()
+            .contains("push")) {
+        //        pushObj = messageJson;
+        emit responsePushMessageReceived(messageJson.value("response")
+                                             .toObject()
+                                             .value("message")
+                                             .toObject()
+                                             .value("content")
+                                             .toObject()
+                                             .value("chat_id")
+                                             .toInt());
+    } else {
+        responseObj = messageJson;
+        emit responseRecieved();
+    }
 }
 
 void Client::onWebcocketStateChanged() {
@@ -106,7 +125,7 @@ void Client::sendRequest(const QJsonObject &requestObj) {
     QByteArray requestBinaryMessage = QJsonDocument(requestObj).toJson();
 
     if (m_debug) {
-        qDebug() << requestBinaryMessage;
+        qDebug("Sent request: %s", qUtf8Printable(requestBinaryMessage));
     }
 
     m_webSocket.sendBinaryMessage(requestBinaryMessage);

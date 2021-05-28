@@ -9,6 +9,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QObject>
 #include <QtWebSockets/QWebSocket>
+#include <memory>
 #include <optional>
 
 class Client : public QObject {
@@ -24,6 +25,7 @@ Q_SIGNALS:
     void closed();
     void responseRecieved();
     void connectionUnstable();
+    void responsePushMessageReceived(int chat_id);
 
 private Q_SLOTS:
     void onConnected();
@@ -40,17 +42,20 @@ private:
 
 public:
     int getId() const;
-    bool sendMessage(Message *, int);
+    bool sendMessage(const QSharedPointer<Message> &, int);
     bool logoutUser();
     // QJsonArray searchMessage(QString message, QString chatId);
     bool createChat(QString name);
-    bool getChatList(QList<Chat *> &chatList);
-    bool getChatMessages(int chatId, QList<Message *> &messageHistory);
-    bool getUserList(QMap<int, QString> &);
+    bool getChatList(QMap<int, QSharedPointer<Chat>> &chatList);
+    bool getChatMessages(int chatId,
+                         QList<QSharedPointer<Message>> &messageHistory);
+    bool getUserList(QMap<int, QString> &, int chatId = -1);
     void waitResponse();
     void sendRequest(const QJsonObject &requestObj);
     bool loginUser(QString login, QString password);
     bool registerUser(QString login, QString password);
+    bool updateUserPhoto(QImage &photo);
+    bool getUserPhoto(QImage &photo);
 };
 
 #endif  // ECHOCLIENT_H

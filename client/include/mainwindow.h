@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <memory>
 #include "chat.h"
 #include "client.h"
 #include "message.h"
@@ -21,17 +22,14 @@ public:
 
 Q_SIGNALS:
     void connectionUnstable();
-private slots:
 
-    void on_SendButton_clicked();
+private slots:
 
     void on_signIn_clicked();
 
     void on_pushButton_2_clicked();
 
     void on_registerButton_clicked();
-
-    void on_signOut_clicked();
 
     void on_messageTextField_returnPressed();
 
@@ -43,15 +41,40 @@ private slots:
 
     void newChat(QString name);
 
+    void on_actionDark_Theme_triggered();
+
+    void on_actionLog_Out_triggered();
+
+    void on_actionMy_Profile_triggered();
+
+    void on_actionChange_my_photo_triggered();
+
+    void inviteUser(int id);
+    // todo: потом сделать этот метод или что-нибудь в этом роде) и кстати у
+    // чатов тоже кажется должен быть свой Id..
+
+    void on_friends_clicked();
+
+    void on_messages_clicked();
+
+    void on_friendList_itemDoubleClicked(QListWidgetItem *item);
+
+    void on_addFriend_clicked();
+
+    void on_searchFriends_textEdited(const QString &arg1);
+    void renderMessages(int chat_id);
+
 private:
     void onConnectionUnstable();
     void updateChats();
-    void renderChats(const QList<Chat *> &);
+    void updateUsers();
     void renderMessages(Chat *);
+    void updateUserProfile(int id, QString name);
+    void renderChats(const QMap<int, QSharedPointer<Chat>> &);
 
     Ui::MainWindow *ui;
     Client client;
-    QList<Chat *> availableChats;
+    QMap<int, QSharedPointer<Chat>> availableChats;
     QMap<int, QString> availibleUsers;
 };
 #endif  // MAINWINDOW_H
