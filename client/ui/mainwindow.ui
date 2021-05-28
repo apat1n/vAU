@@ -126,7 +126,7 @@
             <item>
              <widget class="QStackedWidget" name="stackedWidget_2">
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="page_2">
                <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -147,6 +147,9 @@
               </widget>
               <widget class="QWidget" name="page_3">
                <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <widget class="QLineEdit" name="searchFriends"/>
+                </item>
                 <item>
                  <widget class="QListWidget" name="friendList"/>
                 </item>
@@ -191,12 +194,34 @@
             </widget>
             <widget class="QWidget" name="page_5">
              <layout class="QGridLayout" name="gridLayout_4">
-              <item row="2" column="0" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-               <widget class="QLabel" name="label_2">
-                <property name="text">
-                 <string>TextLabel</string>
-                </property>
-               </widget>
+              <item row="6" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>TextLabel</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="addFriend">
+                  <property name="text">
+                   <string>Add to friend list</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="2" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
+                <item alignment="Qt::AlignHCenter">
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>TextLabel</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
               <item row="1" column="0">
                <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -235,6 +260,30 @@
                 </item>
                </layout>
               </item>
+              <item row="4" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <item alignment="Qt::AlignHCenter">
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>TextLabel</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item row="5" column="0">
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
              </layout>
             </widget>
            </widget>
@@ -268,6 +317,7 @@
     </property>
     <addaction name="actionLog_Out"/>
     <addaction name="actionMy_Profile"/>
+    <addaction name="actionChange_my_photo"/>
    </widget>
    <addaction name="menuSettings"/>
    <addaction name="menuLog_Out"/>
@@ -288,6 +338,11 @@
   <action name="actionMy_Profile">
    <property name="text">
     <string>My Profile</string>
+   </property>
+  </action>
+  <action name="actionChange_my_photo">
+   <property name="text">
+    <string>Change my photo</string>
    </property>
   </action>
  </widget>

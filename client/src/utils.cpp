@@ -54,6 +54,15 @@
     return result;
 }
 
+/*[[nodiscard]] static QList<QListWidgetItem *> foundUsers(const QListWidgetItem input, const QString &pattern ){
+    QList<QListWidgetItem *> result;
+    for (auto *us : input) {
+        if (isMatch(us->text(),pattern)){
+            result.append(us);
+        }
+    }
+}*/
+
 static void clearListWidget(QListWidget *listWidget) {
     while (listWidget->count() > 0) {
         listWidget->takeItem(0);
@@ -68,6 +77,10 @@ static QIcon getChatImage(int id) {
     QPixmap pixmap(1000, 1000);
     pixmap.fill(Qt::red);
     return QIcon(pixmap);
+}
+
+static bool ifFriend(int id, Client &client) {
+    return rand() % 2 == 0;
 }
 
 static QImage getUserImage(int id, Client &client) {

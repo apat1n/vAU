@@ -4,6 +4,7 @@
 #include "createChat.h"
 #include "ui_mainwindow.h"
 #include "utils.cpp"
+#include <QFileDialog>
 
 MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), client(server_url) {
@@ -217,10 +218,24 @@ void MainWindow::on_friends_clicked()
     ui->stackedWidget_2->setCurrentIndex(1);
 }
 
-void MainWindow::updateUserProfile(int id){
+void MainWindow::updateUserProfile(int id, QString name){
     QImage icon = getUserImage(id, client);
     ui->label->setPixmap(QPixmap::fromImage(icon));
+    QFont font = ui->label_3->font();
+    font.setPointSize(24);
+    ui->label_3->setFont(font);
+    font = ui->label_2->font();
+    font.setPointSize(12);
+    ui->label_2->setFont(font);
     ui->label_2->setText(getUserStatus(id));
+    ui->label_3->setText(name);
+    if (!ifFriend(id, client)) {
+        ui->label_4->setText("You can add this user to your friend list");
+        ui->addFriend->show();
+    } else {
+        ui->label_4->setText("This user is already your friend");
+        ui->addFriend->hide();
+    }
 }
 
 void MainWindow::on_messages_clicked()
@@ -230,6 +245,37 @@ void MainWindow::on_messages_clicked()
 
 void MainWindow::on_friendList_itemDoubleClicked(QListWidgetItem *item)
 {
-    updateUserProfile(item->data(Qt::UserRole).toInt());
+    updateUserProfile(item->data(Qt::UserRole).toInt(), item->text());
     ui->stackedWidget_3->setCurrentIndex(1);
+}
+
+void MainWindow::on_addFriend_clicked()
+{
+    ui->label_4->setText("Your request was sent");
+    ui->addFriend->hide();
+    //send friend request
+}
+
+void MainWindow::on_actionChange_my_photo_triggered(){
+    QFileDialog d;
+    d.show();
+}
+
+
+void MainWindow::on_searchFriends_textEdited(const QString &arg1)
+{
+    ui->friendList->clear();
+//    if (!arg1.isEmpty()) {
+//        renderChats(foundUsers(ui->friendList, arg1));
+//    } else {
+//        QMap<int, QString> mp;
+//        client.getUserList(mp);
+//        QMap<int, QString>::iterator it;
+//        for(it = mp.begin(); it!= mp.end(); it++){
+//           QListWidgetItem* item;
+//            item->setText(it.value());
+//            item->setData(Qt::UserRole, it.key());
+//            ui->friendList->addItem(item);
+//        }
+//    }
 }
