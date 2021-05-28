@@ -3,7 +3,7 @@
 Chat::Chat(int chatId, const QString name_) : chatId(chatId), name(name_) {
 }
 
-[[nodiscard]] QList<Message *> Chat::getHistory() const {
+[[nodiscard]] QList<QSharedPointer<Message>> &Chat::getHistory() {
     return message_history;
 }
 
@@ -15,11 +15,11 @@ Chat::Chat(int chatId, const QString name_) : chatId(chatId), name(name_) {
     return chatId;
 }
 
-void Chat::addMessage(Message *message) {
+void Chat::addMessage(QSharedPointer<Message> message) {
     message_history.append(message);
 }
 
-void Chat::updateMessageHistory(QList<Message *> &&newHistory) {
+void Chat::updateMessageHistory(QList<QSharedPointer<Message>> &newHistory) {
     message_history.clear();
     std::swap(newHistory, message_history);
 }

@@ -28,7 +28,7 @@ public:
     bool createMessage(int chat_id, int user_id, QString message, QDate date);
     QList<Chat> getChatList(User &user);
     QList<Message> getMessageList(int chatId);
-    QMap<int, QString> getUserList();
+    QMap<int, QString> getUserList(int chatId);
 };
 
 #endif  // DATABASE_H
