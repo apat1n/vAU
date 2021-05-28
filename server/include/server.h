@@ -1,12 +1,11 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <QSqlDatabase>
-#include <QSqlDriver>
-#include <QSqlQuery>
+#include <QProcessEnvironment>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
 #include <QtCore/QObject>
+#include "database.h"
 #include "models/chat.h"
 #include "models/message.h"
 #include "models/user.h"
@@ -36,8 +35,10 @@ private:
     QMap<QWebSocket *, User> authenticatedUsers;
     QMap<int, QWebSocket *> authenticatedUsersId;
 
-    QSqlDatabase db;
     bool m_debug;
+
+    QProcessEnvironment env;
+    Database db;
 
     void processLoginRequest(QJsonObject, QWebSocket *);
     void processRegisterRequest(QJsonObject, QWebSocket *);
@@ -47,17 +48,11 @@ private:
     void proccessChatGetMessages(QJsonObject, QWebSocket *);
     void processSendMessageRequest(QJsonObject, QWebSocket *);
     void processGetUserList(QJsonObject, QWebSocket *);
+    void processUpdateUserPhoto(QJsonObject, QWebSocket *);
+    void processGetUserPhoto(QJsonObject, QWebSocket *);
 
-    bool authUser(User &, QString);
-    bool registerUser(QString, QString);
     bool isAuthorized(const QJsonObject &, QWebSocket *);
-
-    bool createChat(QString, int);
-    QList<Chat> getChatList(User &);
-    QList<Message> getMessageList(int chatId);
-    QMap<int, QString> getUserList(int chatId = -1);
-
-    bool createMessage(int, int, QString, QDate);
+    bool updateUserPhoto(User &, QImage &);
 };
 
 #endif  // SERVER_H

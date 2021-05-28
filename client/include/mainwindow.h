@@ -46,6 +46,8 @@ private slots:
 
     void renderMessages(int chat_id);
 
+    void inviteUser(int id);
+
 private:
     void onConnectionUnstable();
     void updateChats();

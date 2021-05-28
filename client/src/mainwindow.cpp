@@ -64,7 +64,7 @@ void MainWindow::on_registerButton_clicked() {
     QString password = ui->inputPassword->text();
 
     if (client.registerUser(login, password)) {
-        ui->stackedWidget->setCurrentIndex(1);
+        ui->stackedWidget->setCurrentIndex(2);
         updateChats();
         ui->errorRegister->hide();
     } else {
@@ -174,9 +174,18 @@ void MainWindow::updateChats() {
     renderChats(availableChats);
 }
 
+void MainWindow::inviteUser(int id) {
+    qDebug() << id;
+}
+
 void MainWindow::on_createChatButton_clicked() {
-    Dialog creating;
+    QMap<int, QString> users;
+    client.getUserList(users);
+    Dialog creating(client, users);
+    connect(&creating, SIGNAL(requestAddUser(int)), this,
+            SLOT(inviteUser(int)));
     connect(&creating, SIGNAL(requestCreating(const QString &)), this,
             SLOT(newChat(const QString &)));
+
     creating.exec();
 }

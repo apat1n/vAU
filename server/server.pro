@@ -11,13 +11,14 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += \
+    src/database.cpp \
     src/main.cpp \
     src/server.cpp \
-    src/db_utils.cpp \
     src/server_processes.cpp \
     src/utils.cpp
 
 HEADERS += \
+    include/database.h \
     include/models/message.h \
     include/server.h \
     include/models/common.h \
