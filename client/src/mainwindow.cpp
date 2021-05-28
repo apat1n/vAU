@@ -11,7 +11,7 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->errorLogin->hide();
     ui->errorRegister->hide();
     client.connectServer();
-    QFile file("/home/vtgcon/Загрузки/style0.qss");
+    QFile file(":/styles/light.qss");
     file.open(QFile::ReadOnly);
     QString styleSheet = QLatin1String(file.readAll());
     qApp->setStyleSheet(styleSheet);
@@ -151,12 +151,12 @@ void MainWindow::inviteUser(int id) {
 
 void MainWindow::on_actionDark_Theme_triggered() {
     if (ui->actionDark_Theme->isChecked()) {
-        QFile file("/home/vtgcon/Загрузки/style.qss");
+        QFile file(":/styles/dark.qss");
         file.open(QFile::ReadOnly);
         QString styleSheet = QLatin1String(file.readAll());
         qApp->setStyleSheet(styleSheet);
     } else {
-        QFile file("/home/vtgcon/Загрузки/style0.qss");
+        QFile file(":/styles/light.qss");
         file.open(QFile::ReadOnly);
         QString styleSheet = QLatin1String(file.readAll());
         qApp->setStyleSheet(styleSheet);
