@@ -79,10 +79,10 @@ static bool ifFriend(int id, Client &client) {
 
 static QImage getUserImage(int id, Client &client) {
     QImage photo;
-//    if (!client.getUserPhoto(photo)) {
-        photo = QImage(256, 256, QImage::Format_RGB32);
-        photo.fill(Qt::blue);
-//    }
+    //    if (!client.getUserPhoto(photo)) {
+    photo = QImage(256, 256, QImage::Format_RGB32);
+    photo.fill(Qt::blue);
+    //    }
     return photo;
 }
 

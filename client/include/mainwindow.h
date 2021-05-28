@@ -68,7 +68,6 @@ private:
     void onConnectionUnstable();
     void updateChats();
     void updateUsers();
-    void renderMessages(Chat *);
     void updateUserProfile(int id, QString name);
     void renderChats(const QMap<int, QSharedPointer<Chat>> &);
 
