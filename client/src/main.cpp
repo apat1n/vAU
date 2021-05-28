@@ -4,7 +4,30 @@
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    MainWindow w("ws://localhost:1234");
+    QCommandLineParser parser;
+    parser.setApplicationDescription("vau Client");
+    parser.addHelpOption();
+
+    QCommandLineOption ipOption(
+        QStringList() << "d"
+                      << "debug",
+        QCoreApplication::translate(
+            "main", "Ip of server output [default: localhost]."),
+        QLatin1String("localhost"));
+    parser.addOption(ipOption);
+    QCommandLineOption portOption(
+        QStringList() << "p"
+                      << "port",
+        QCoreApplication::translate("main",
+                                    "Port for echoserver [default: 1234]."),
+        QCoreApplication::translate("main", "port"), QLatin1String("1234"));
+    parser.addOption(portOption);
+    parser.process(a);
+
+    bool ip = parser.isSet(ipOption);
+    int port = parser.value(portOption).toInt();
+
+    MainWindow w(QString("ws://%1:%2").arg(ip).arg(port));
     w.show();
     return a.exec();
 }
