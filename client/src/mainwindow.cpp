@@ -106,7 +106,7 @@ void MainWindow::on_search_textEdited(const QString &searchRequest) {
 }
 
 void MainWindow::renderChats(const QMap<int, QSharedPointer<Chat>> &chatsList) {
-    client.getUserList(availibleUsers);
+    // client.getUserList(availibleUsers);
     clearListWidget(ui->chatMenu);
 
     for (QMap<int, QSharedPointer<Chat>>::const_iterator it =

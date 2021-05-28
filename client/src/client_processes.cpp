@@ -198,14 +198,13 @@ bool Client::getUserList(QMap<int, QString> &userList, int chatId) {
 
     QJsonArray responseArray =
         responseBody.value("message").toObject().value("content").toArray();
+    responseObj.reset();
     for (auto user_it : responseArray) {
         int user_id = user_it.toObject().value("user_id").toInt();
         QString user_name = user_it.toObject().value("user_name").toString();
 
         userList[user_id] = user_name;
     }
-
-    responseObj.reset();
 
     return method == sentMethod && status == 200;
 }
