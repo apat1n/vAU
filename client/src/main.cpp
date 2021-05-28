@@ -12,6 +12,7 @@ int main(int argc, char *argv[]) {
         QStringList() << "ip",
         QCoreApplication::translate(
             "main", "Ip of server output [default: localhost]."),
+        QCoreApplication::translate("main", "port"),
         QLatin1String("localhost"));
     parser.addOption(ipOption);
     QCommandLineOption portOption(
