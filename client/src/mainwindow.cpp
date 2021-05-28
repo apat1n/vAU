@@ -11,7 +11,7 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->errorLogin->hide();
     ui->errorRegister->hide();
     client.connectServer();
-    QFile file("/home/vtgcon/Загрузки/style0.qss");
+    QFile file(":/styles/light.qss");
     file.open(QFile::ReadOnly);
     QString styleSheet = QLatin1String(file.readAll());
     qApp->setStyleSheet(styleSheet);
@@ -116,7 +116,7 @@ void MainWindow::renderMessages(Chat *chat) {
                                         " ] : " + it->getText();
                     qDebug() << textField;
                     widgetElem->setText(textField);
-                    widgetElem->setIcon(getUserImage(it->getAuthorId()));
+                    widgetElem->setIcon(QIcon(QPixmap::fromImage(getUserImage(it->getAuthorId(),client))));
                     ui->chatView->addItem(widgetElem);
                 }
             }
@@ -160,7 +160,7 @@ void MainWindow::updateUsers() {
 //            qDebug() << i.key() << " ";
             QListWidgetItem *it = new QListWidgetItem;
             it->setText(i.value());
-            it->setIcon(getUserImage(i.key()));
+            it->setIcon(QIcon(QPixmap::fromImage(getUserImage(i.key(),client))));
             it->setData(Qt::UserRole, i.key());
             ui->friendList->addItem(it);
         }
@@ -173,12 +173,12 @@ void MainWindow::inviteUser(int id) {
 
 void MainWindow::on_actionDark_Theme_triggered() {
     if (ui->actionDark_Theme->isChecked()) {
-        QFile file("/home/vtgcon/Загрузки/style.qss");
+        QFile file(":/styles/dark.qss");
         file.open(QFile::ReadOnly);
         QString styleSheet = QLatin1String(file.readAll());
         qApp->setStyleSheet(styleSheet);
     } else {
-        QFile file("/home/vtgcon/Загрузки/style0.qss");
+        QFile file(":/styles/light.qss");
         file.open(QFile::ReadOnly);
         QString styleSheet = QLatin1String(file.readAll());
         qApp->setStyleSheet(styleSheet);
@@ -194,16 +194,15 @@ void MainWindow::on_actionLog_Out_triggered() {
 
 void MainWindow::on_actionMy_Profile_triggered() {
     ui->stackedWidget_3->setCurrentIndex(1);
-    QIcon icon = getUserImage(client.getId());
-    ui->label->setPixmap(icon.pixmap(icon.actualSize(QSize(256,256))));
+    QImage icon = getUserImage(client.getId(),client);
+    ui->label->setPixmap(QPixmap::fromImage(icon));
     ui->label_2->setText(getUserStatus(client.getId()));
 }
 
 void MainWindow::on_createChatButton_clicked() {
     QMap<int, QString> users;
     client.getUserList(users);
-    Dialog creating(users);
-
+    Dialog creating(client, users);
     connect(&creating, SIGNAL(requestAddUser(int)), this,
             SLOT(inviteUser(int)));
     connect(&creating, SIGNAL(requestCreating(const QString &)), this,
@@ -219,8 +218,8 @@ void MainWindow::on_friends_clicked()
 }
 
 void MainWindow::updateUserProfile(int id){
-    QIcon icon = getUserImage(id);
-    ui->label->setPixmap(icon.pixmap(icon.actualSize(QSize(256,256))));
+    QImage icon = getUserImage(id, client);
+    ui->label->setPixmap(QPixmap::fromImage(icon));
     ui->label_2->setText(getUserStatus(id));
 }
 

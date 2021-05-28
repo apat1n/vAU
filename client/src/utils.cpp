@@ -1,4 +1,4 @@
-#include <chat.h>
+#include <QBuffer>
 #include <QDebug>
 #include <QDir>
 #include <QImage>
@@ -8,6 +8,8 @@
 #include <QString>
 #include <algorithm>
 #include <vector>
+#include "chat.h"
+#include "client.h"
 
 [[nodiscard]] static bool isMatch(const QString &message,
                                   const QString &pattern) {
@@ -33,6 +35,14 @@
     return *std::max_element(z.begin(), z.end()) == pattern.size();
 }
 
+[[nodiscard]] static QString imageToBase64(const QImage &image) {
+    QByteArray byteArray;
+    QBuffer buffer(&byteArray);
+    image.save(&buffer,
+               "PNG");  // writes the image in PNG format inside the buffer
+    return QString::fromUtf8(byteArray.toBase64().data());
+}
+
 [[nodiscard]] static QList<Chat *> foundMatches(const QList<Chat *> input,
                                                 const QString &pattern) {
     QList<Chat *> result;
@@ -50,12 +60,6 @@ static void clearListWidget(QListWidget *listWidget) {
     }
 }
 
-static QIcon getUserImage(int id) {
-    QPixmap pixmap(1000, 1000);
-    pixmap.fill(Qt::red);
-    return QIcon(pixmap);
-}
-
 static QString getUserStatus(int id) {
     return "_status_";
 }
@@ -64,6 +68,15 @@ static QIcon getChatImage(int id) {
     QPixmap pixmap(1000, 1000);
     pixmap.fill(Qt::red);
     return QIcon(pixmap);
+}
+
+static QImage getUserImage(int id, Client &client) {
+    QImage photo;
+//    if (!client.getUserPhoto(photo)) {
+        photo = QImage(256, 256, QImage::Format_RGB32);
+        photo.fill(Qt::blue);
+//    }
+    return photo;
 }
 
 static void saveImage(const QImage &image, const QString &filename) {

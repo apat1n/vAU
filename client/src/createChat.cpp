@@ -4,17 +4,18 @@
 #include "client.h"
 #include "ui_createChat.h"
 #include "utils.cpp"
-Dialog::Dialog(QMap<int, QString> users_, QWidget *parent)
-    : QDialog(parent), ui(new Ui::Dialog) {
+
+Dialog::Dialog(Client &client, QMap<int, QString> users_, QWidget *parent)
+    : QDialog(parent), ui(new Ui::Dialog), client(client) {
     ui->setupUi(this);
-    ui->avaliableUsers->setIconSize(QSize(64, 64));
+    ui->avaliableUsers->setIconSize(QSize(32, 32));
     QMap<int, QString>::iterator i;
     for (i = users_.begin(); i != users_.end(); i++) {
         QListWidgetItem *it = new QListWidgetItem;
         it->setText(i.value());
         it->setCheckState(Qt::Unchecked);
         it->setData(Qt::UserRole, i.key());
-        it->setIcon(getUserImage(i.key()));
+        it->setIcon(QPixmap::fromImage(getUserImage(i.key(), client)));
         ui->avaliableUsers->addItem(it);
     }
 }
