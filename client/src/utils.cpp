@@ -35,6 +35,20 @@
     return *std::max_element(z.begin(), z.end()) == pattern.size();
 }
 
+[[nodiscard]] static QMap<int, QSharedPointer<Chat>> foundMatches(
+    const QMap<int, QSharedPointer<Chat>> &input,
+    const QString &pattern) {
+    QMap<int, QSharedPointer<Chat>> result;
+    for (QMap<int, QSharedPointer<Chat>>::const_iterator chat =
+             input.constBegin();
+         chat != input.constEnd(); ++chat) {
+        if (isMatch(chat.value()->getName(), pattern)) {
+            result.insert(chat.key(), chat.value());
+        }
+    }
+    return result;
+}
+
 [[nodiscard]] static QString imageToBase64(const QImage &image) {
     QByteArray byteArray;
     QBuffer buffer(&byteArray);
@@ -42,26 +56,6 @@
                "PNG");  // writes the image in PNG format inside the buffer
     return QString::fromUtf8(byteArray.toBase64().data());
 }
-
-[[nodiscard]] static QList<Chat *> foundMatches(const QList<Chat *> input,
-                                                const QString &pattern) {
-    QList<Chat *> result;
-    for (auto *chat : input) {
-        if (isMatch(chat->getName(), pattern)) {
-            result.append(chat);
-        }
-    }
-    return result;
-}
-
-/*[[nodiscard]] static QList<QListWidgetItem *> foundUsers(const QListWidgetItem input, const QString &pattern ){
-    QList<QListWidgetItem *> result;
-    for (auto *us : input) {
-        if (isMatch(us->text(),pattern)){
-            result.append(us);
-        }
-    }
-}*/
 
 static void clearListWidget(QListWidget *listWidget) {
     while (listWidget->count() > 0) {

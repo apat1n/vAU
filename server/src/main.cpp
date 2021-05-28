@@ -5,7 +5,7 @@
 int main(int argc, char *argv[]) {
     QCoreApplication a(argc, argv);
     QCommandLineParser parser;
-    parser.setApplicationDescription("QtWebSockets example: echoserver");
+    parser.setApplicationDescription("vau Server");
     parser.addHelpOption();
 
     QCommandLineOption dbgOption(
@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
         QCoreApplication::translate("main", "port"), QLatin1String("1234"));
     parser.addOption(portOption);
     parser.process(a);
+
     bool debug = parser.isSet(dbgOption);
     int port = parser.value(portOption).toInt();
 

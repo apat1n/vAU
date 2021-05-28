@@ -32,6 +32,8 @@ void Server::processLoginRequest(QJsonObject requestBody, QWebSocket *pSender) {
     QJsonObject responseObj;
     if (db.authUser(user, password)) {
         authenticatedUsers[pSender] = user;
+        authenticatedUsersId[user.id] = pSender;
+
         QJsonObject content;
         content["id"] = user.id;
         responseObj = getJsonResponseInstance(
@@ -43,7 +45,8 @@ void Server::processLoginRequest(QJsonObject requestBody, QWebSocket *pSender) {
 
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
     if (m_debug) {
-        qDebug() << "response" << responseBinaryMessage;
+        qDebug("processLoginRequest response: %s\n",
+               qUtf8Printable(responseBinaryMessage));
     }
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
@@ -59,6 +62,7 @@ void Server::processRegisterRequest(QJsonObject requestBody,
         User user = User({-1, login, pSender});
         db.authUser(user, password);
         authenticatedUsers[pSender] = user;
+        authenticatedUsersId[user.id] = pSender;
 
         QJsonObject content;
         content["id"] =
@@ -72,7 +76,8 @@ void Server::processRegisterRequest(QJsonObject requestBody,
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {
-        qDebug() << "response" << responseBinaryMessage;
+        qDebug("processRegisterRequest response: %s\n",
+               qUtf8Printable(responseBinaryMessage));
     }
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
@@ -80,6 +85,7 @@ void Server::processRegisterRequest(QJsonObject requestBody,
 void Server::processLogoutRequest(QJsonObject requestBody,
                                   QWebSocket *pSender) {
     if (!authenticatedUsers.contains(pSender)) {
+        authenticatedUsersId.remove(authenticatedUsers[pSender].id);
         authenticatedUsers.remove(pSender);
     }
 
@@ -88,7 +94,8 @@ void Server::processLogoutRequest(QJsonObject requestBody,
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {
-        qDebug() << "response" << responseBinaryMessage;
+        qDebug("processLogout response: %s\n",
+               qUtf8Printable(responseBinaryMessage));
     }
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
@@ -116,7 +123,8 @@ void Server::processGetChatListRequest(QJsonObject requestBody,
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {
-        qDebug() << "response" << responseBinaryMessage;
+        qDebug("processGetChatList response: %s\n",
+               qUtf8Printable(responseBinaryMessage));
     }
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
@@ -145,7 +153,8 @@ void Server::proccessChatGetMessages(QJsonObject requestBody,
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {
-        qDebug() << "response" << responseBinaryMessage;
+        qDebug("processGetChatMessages response: %s\n",
+               qUtf8Printable(responseBinaryMessage));
     }
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
@@ -172,7 +181,8 @@ void Server::processCreateChatRequest(QJsonObject requestBody,
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {
-        qDebug() << "response" << responseBinaryMessage;
+        qDebug("processCreateCharRequest response: %s\n",
+               qUtf8Printable(responseBinaryMessage));
     }
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
@@ -192,20 +202,47 @@ void Server::processSendMessageRequest(QJsonObject requestBody,
     QString text_message = requestMessage.value("content").toString();
     QDate date = QDate::currentDate();
 
-    QJsonObject responseObj;
+    QJsonObject responseObj, responsePushObj;
+
     if (db.createMessage(chat_id, user_id, text_message, date)) {
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), 200);
+
+        QJsonObject message;
+        message["push"] = 1;
+        message["chat_id"] = chat_id;
+
+        responsePushObj = getJsonResponseInstance(
+            requestBody.value("method").toString(), std::move(message), 200);
+
     } else {
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), 401);
     }
 
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
-    if (m_debug) {
-        qDebug() << "response" << responseBinaryMessage;
+    QByteArray responsePushBinaryMessage =
+        QJsonDocument(responsePushObj).toJson();
+
+    QMap<int, QString> userList = db.getUserList(chat_id);
+    for (QMap<int, QString>::iterator user_it = userList.begin();
+         user_it != userList.end(); ++user_it) {
+        if (authenticatedUsersId.contains(user_it.key())) {
+            if (authenticatedUsersId[user_it.key()] == pSender) {
+                authenticatedUsersId[user_it.key()]->sendBinaryMessage(
+                    responseBinaryMessage);
+                qDebug("processSendMessageRequest sent to sender %s: %s\n",
+                       qUtf8Printable(user_it.value()),
+                       qUtf8Printable(responseBinaryMessage));
+            } else {
+                authenticatedUsersId[user_it.key()]->sendBinaryMessage(
+                    responsePushBinaryMessage);
+                qDebug("processSendMessageRequest sent push to %s: %s\n",
+                       qUtf8Printable(user_it.value()),
+                       qUtf8Printable(responsePushBinaryMessage));
+            }
+        }
     }
-    pSender->sendBinaryMessage(responseBinaryMessage);
 }
 
 void Server::processGetUserList(QJsonObject requestBody, QWebSocket *pSender) {
@@ -214,17 +251,17 @@ void Server::processGetUserList(QJsonObject requestBody, QWebSocket *pSender) {
     }
     // if user in chat
 
+    int chatId =
+        requestBody.value("message").toObject().value("chatId").toInt();
+
     QJsonArray contentArray;
     /* Filling contentArray */ {
-        QMap<int, QString> userList = db.getUserList();
+        QMap<int, QString> userList = db.getUserList(chatId);
         QMap<int, QString>::iterator user_it;
         for (user_it = userList.begin(); user_it != userList.end(); ++user_it) {
             QJsonObject chatItem;
             chatItem["user_id"] = user_it.key();
             chatItem["user_name"] = user_it.value();
-            if (m_debug) {
-                qDebug() << user_it.key() << " " << user_it.value();
-            }
             contentArray.append(chatItem);
         }
     }
@@ -234,7 +271,8 @@ void Server::processGetUserList(QJsonObject requestBody, QWebSocket *pSender) {
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {
-        qDebug() << "response" << responseBinaryMessage;
+        qDebug("processGetUserList response: %s\n",
+               qUtf8Printable(responseBinaryMessage));
     }
     pSender->sendBinaryMessage(responseBinaryMessage);
 }

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <memory>
 #include "chat.h"
 #include "client.h"
 #include "message.h"
@@ -61,18 +62,19 @@ private slots:
     void on_addFriend_clicked();
 
     void on_searchFriends_textEdited(const QString &arg1);
+    void renderMessages(int chat_id);
 
 private:
     void onConnectionUnstable();
     void updateChats();
     void updateUsers();
-    void renderChats(const QList<Chat *> &);
     void renderMessages(Chat *);
     void updateUserProfile(int id, QString name);
+    void renderChats(const QMap<int, QSharedPointer<Chat>> &);
 
     Ui::MainWindow *ui;
     Client client;
-    QList<Chat *> availableChats;
+    QMap<int, QSharedPointer<Chat>> availableChats;
     QMap<int, QString> availibleUsers;
 };
 #endif  // MAINWINDOW_H

@@ -33,6 +33,8 @@ private:
     QWebSocketServer *m_pWebSocketServer;
     QList<QWebSocket *> m_clients;
     QMap<QWebSocket *, User> authenticatedUsers;
+    QMap<int, QWebSocket *> authenticatedUsersId;
+
     bool m_debug;
 
     QProcessEnvironment env;
@@ -51,13 +53,6 @@ private:
 
     bool isAuthorized(const QJsonObject &, QWebSocket *);
     bool updateUserPhoto(User &, QImage &);
-
-    bool createChat(QString, int);
-    QList<Chat> getChatList(User &);
-    QList<Message> getMessageList(int chatId);
-    QMap<int, QString> getUserList();
-
-    bool createMessage(int, int, QString, QDate);
 };
 
 #endif  // SERVER_H
