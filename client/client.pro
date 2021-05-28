@@ -33,7 +33,13 @@ FORMS += \
 INCLUDEPATH += include
 UI_DIR = ui
 
+RESOURCES = resources.qrc
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    ../../../Загрузки/style.qss \
+    ../../../Загрузки/style0.qss

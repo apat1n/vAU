@@ -4,6 +4,7 @@
 #include "client.h"
 #include "ui_createChat.h"
 #include "utils.cpp"
+
 Dialog::Dialog(Client &client, QMap<int, QString> users_, QWidget *parent)
     : QDialog(parent), ui(new Ui::Dialog), client(client) {
     ui->setupUi(this);

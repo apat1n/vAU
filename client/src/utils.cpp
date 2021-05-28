@@ -63,12 +63,26 @@ static void clearListWidget(QListWidget *listWidget) {
     }
 }
 
+static QString getUserStatus(int id) {
+    return "_status_";
+}
+
+static QIcon getChatImage(int id) {
+    QPixmap pixmap(1000, 1000);
+    pixmap.fill(Qt::red);
+    return QIcon(pixmap);
+}
+
+static bool ifFriend(int id, Client &client) {
+    return rand() % 2 == 0;
+}
+
 static QImage getUserImage(int id, Client &client) {
     QImage photo;
-    if (!client.getUserPhoto(photo)) {
+//    if (!client.getUserPhoto(photo)) {
         photo = QImage(256, 256, QImage::Format_RGB32);
         photo.fill(Qt::blue);
-    }
+//    }
     return photo;
 }
 
