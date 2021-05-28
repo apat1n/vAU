@@ -9,8 +9,7 @@ int main(int argc, char *argv[]) {
     parser.addHelpOption();
 
     QCommandLineOption ipOption(
-        QStringList() << "d"
-                      << "debug",
+        QStringList() << "ip",
         QCoreApplication::translate(
             "main", "Ip of server output [default: localhost]."),
         QLatin1String("localhost"));
@@ -24,7 +23,7 @@ int main(int argc, char *argv[]) {
     parser.addOption(portOption);
     parser.process(a);
 
-    bool ip = parser.isSet(ipOption);
+    QString ip = parser.value(ipOption);
     int port = parser.value(portOption).toInt();
 
     MainWindow w(QString("ws://%1:%2").arg(ip).arg(port));

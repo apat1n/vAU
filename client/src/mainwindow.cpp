@@ -119,7 +119,10 @@ void MainWindow::renderChats(const QMap<int, QSharedPointer<Chat>> &chatsList) {
 }
 
 void MainWindow::renderMessages(int chat_id) {
-    if (!availableChats.contains(chat_id)) {
+    if (!dynamic_cast<Chat *>(ui->chatMenu->currentItem()) ||
+        dynamic_cast<Chat *>(ui->chatMenu->currentItem())->getChatId() !=
+            chat_id ||
+        !availableChats.contains(chat_id)) {
         return;
     }
 
