@@ -44,13 +44,25 @@ private slots:
 
     void on_actionLog_Out_triggered();
 
+    void on_actionMy_Profile_triggered();
+
     void inviteUser(int id);
-    //todo: потом сделать этот метод или что-нибудь в этом роде) и кстати у чатов тоже кажется должен быть свой Id..
+    // todo: потом сделать этот метод или что-нибудь в этом роде) и кстати у
+    // чатов тоже кажется должен быть свой Id..
+
+    void on_friends_clicked();
+
+    void on_messages_clicked();
+
+    void on_friendList_itemDoubleClicked(QListWidgetItem *item);
+
 private:
     void onConnectionUnstable();
     void updateChats();
+    void updateUsers();
     void renderChats(const QList<Chat *> &);
     void renderMessages(Chat *);
+    void updateUserProfile(int id);
 
     Ui::MainWindow *ui;
     Client client;

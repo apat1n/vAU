@@ -51,7 +51,17 @@ static void clearListWidget(QListWidget *listWidget) {
 }
 
 static QIcon getUserImage(int id) {
-    QPixmap pixmap(1000,1000);
+    QPixmap pixmap(1000, 1000);
+    pixmap.fill(Qt::red);
+    return QIcon(pixmap);
+}
+
+static QString getUserStatus(int id) {
+    return "_status_";
+}
+
+static QIcon getChatImage(int id) {
+    QPixmap pixmap(1000, 1000);
     pixmap.fill(Qt::red);
     return QIcon(pixmap);
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>767</width>
-    <height>555</height>
+    <width>1017</width>
+    <height>694</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -121,35 +121,123 @@
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout">
-          <item row="3" column="4">
-           <widget class="QLineEdit" name="messageTextField"/>
-          </item>
-          <item row="0" column="4" rowspan="3">
-           <widget class="QListWidget" name="chatView"/>
-          </item>
-          <item row="0" column="3" rowspan="4">
-           <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item row="0" column="1" rowspan="3">
+           <layout class="QVBoxLayout" name="verticalLayout_4">
             <item>
-             <widget class="QLineEdit" name="search"/>
-            </item>
-            <item>
-             <widget class="QListWidget" name="chatMenu">
-              <property name="maximumSize">
-               <size>
-                <width>362</width>
-                <height>16777215</height>
-               </size>
+             <widget class="QStackedWidget" name="stackedWidget_2">
+              <property name="currentIndex">
+               <number>0</number>
               </property>
+              <widget class="QWidget" name="page_2">
+               <layout class="QVBoxLayout" name="verticalLayout_3">
+                <item>
+                 <widget class="QLineEdit" name="search"/>
+                </item>
+                <item>
+                 <widget class="QListWidget" name="chatMenu"/>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="createChatButton">
+                  <property name="text">
+                   <string>Create a new chat</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="page_3">
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <widget class="QListWidget" name="friendList"/>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="createChatButton">
-              <property name="text">
-               <string>Create a new chat</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QPushButton" name="friends">
+                <property name="text">
+                 <string>Friends</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="messages">
+                <property name="text">
+                 <string>Messages</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
+          </item>
+          <item row="0" column="2" rowspan="3">
+           <widget class="QStackedWidget" name="stackedWidget_3">
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <widget class="QWidget" name="page_4">
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <item>
+               <widget class="QListWidget" name="chatView"/>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="messageTextField"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="page_5">
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="2" column="0" alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>TextLabel</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </widget>
           </item>
          </layout>
         </item>
@@ -164,7 +252,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>767</width>
+     <width>1017</width>
      <height>22</height>
     </rect>
    </property>
@@ -179,6 +267,7 @@
      <string>User</string>
     </property>
     <addaction name="actionLog_Out"/>
+    <addaction name="actionMy_Profile"/>
    </widget>
    <addaction name="menuSettings"/>
    <addaction name="menuLog_Out"/>
@@ -194,6 +283,11 @@
   <action name="actionLog_Out">
    <property name="text">
     <string>Log Out</string>
+   </property>
+  </action>
+  <action name="actionMy_Profile">
+   <property name="text">
+    <string>My Profile</string>
    </property>
   </action>
  </widget>

@@ -13,8 +13,9 @@ Q_SIGNALS:
     void requestCreating(QString name);
 
     void requestAddUser(int id);
+
 public:
-    explicit Dialog(QMap<int, QString> users_,QWidget *parent = nullptr);
+    explicit Dialog(QMap<int, QString> users_, QWidget *parent = nullptr);
     ~Dialog();
 private slots:
     void on_createChat_clicked();
