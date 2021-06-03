@@ -44,7 +44,6 @@ public:
     int getId() const;
     bool sendMessage(const QSharedPointer<Message> &, int);
     bool logoutUser();
-    // QJsonArray searchMessage(QString message, QString chatId);
     bool createChat(QString name);
     bool getChatList(QMap<int, QSharedPointer<Chat>> &chatList);
     bool getChatMessages(int chatId,
@@ -55,7 +54,9 @@ public:
     bool loginUser(QString login, QString password);
     bool registerUser(QString login, QString password);
     bool updateUserPhoto(QImage &photo);
-    bool getUserPhoto(QImage &photo);
+    bool getUserPhoto(QImage &photo, int userId);
+    bool getContactList(QMap<int, QString> &);
+    bool addUserContact(int userId);
 };
 
 #endif  // ECHOCLIENT_H

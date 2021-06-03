@@ -172,19 +172,31 @@ void MainWindow::updateChats() {
 }
 
 void MainWindow::updateUsers() {
-    QMap<int, QString> newUsers;
-    if (client.getUserList(newUsers)) {
+    QMap<int, QString> newAvailableUsers;
+    if (client.getUserList(newAvailableUsers)) {
         clearListWidget(ui->friendList);
-        QMap<int, QString>::Iterator i;
-        for (i = newUsers.begin(); i != newUsers.end(); i++) {
-            //            qDebug() << i.key() << " ";
-            QListWidgetItem *it = new QListWidgetItem;
-            it->setText(i.value());
-            it->setIcon(
-                QIcon(QPixmap::fromImage(getUserImage(i.key(), client))));
-            it->setData(Qt::UserRole, i.key());
-            ui->friendList->addItem(it);
-        }
+        availibleUsers.clear();
+        std::swap(newAvailableUsers, availibleUsers);
+    }
+    QMap<int, QString> newAvailableContacts;
+    if (client.getContactList(newAvailableContacts)) {
+        clearListWidget(ui->friendList);
+        contacts.clear();
+        std::swap(newAvailableContacts, contacts);
+    }
+    renderUsers(contacts);
+}
+
+void MainWindow::renderUsers(const QMap<int, QString> &userList) {
+    clearListWidget(ui->friendList);
+    for (QMap<int, QString>::const_iterator it = userList.constBegin();
+         it != userList.constEnd(); ++it) {
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setText(it.value());
+        item->setData(Qt::UserRole, it.key());
+        item->setIcon(
+            QIcon(QPixmap::fromImage(getUserImage(it.key(), client))));
+        ui->friendList->addItem(item);
     }
 }
 
@@ -248,12 +260,12 @@ void MainWindow::updateUserProfile(int id, QString name) {
     ui->label_2->setFont(font);
     ui->label_2->setText(getUserStatus(id));
     ui->label_3->setText(name);
-    if (!ifFriend(id, client)) {
-        ui->label_4->setText("You can add this user to your friend list");
-        ui->addFriend->show();
-    } else {
+    if (contacts.contains(id)) {
         ui->label_4->setText("This user is already your friend");
         ui->addFriend->hide();
+    } else {
+        ui->label_4->setText("You can add this user to your friend list");
+        ui->addFriend->show();
     }
 }
 
@@ -261,35 +273,38 @@ void MainWindow::on_messages_clicked() {
     ui->stackedWidget_2->setCurrentIndex(0);
 }
 
-void MainWindow::on_friendList_itemDoubleClicked(QListWidgetItem *item) {
+void MainWindow::on_friendList_itemClicked(QListWidgetItem *item) {
     updateUserProfile(item->data(Qt::UserRole).toInt(), item->text());
     ui->stackedWidget_3->setCurrentIndex(1);
 }
 
 void MainWindow::on_addFriend_clicked() {
+    int userId = ui->friendList->currentItem()->data(Qt::UserRole).toInt();
     ui->label_4->setText("Your request was sent");
     ui->addFriend->hide();
-    // send friend request
+    client.addUserContact(userId);
 }
 
 void MainWindow::on_actionChange_my_photo_triggered() {
-    QFileDialog d;
-    d.show();
+    QString newPhoto = QFileDialog::getOpenFileName(
+        this, "Upload a photo", "/home", "*.jpg *.png *.bmp");
+    //    ui->stackedWidget_3->setCurrentIndex(1);
+    QImage icon = QImage(newPhoto).scaled(256, 256);
+    client.updateUserPhoto(icon);
 }
 
 void MainWindow::on_searchFriends_textEdited(const QString &arg1) {
-    ui->friendList->clear();
-    //    if (!arg1.isEmpty()) {
-    //        renderChats(foundUsers(ui->friendList, arg1));
-    //    } else {
-    //        QMap<int, QString> mp;
-    //        client.getUserList(mp);
-    //        QMap<int, QString>::iterator it;
-    //        for(it = mp.begin(); it!= mp.end(); it++){
-    //           QListWidgetItem* item;
-    //            item->setText(it.value());
-    //            item->setData(Qt::UserRole, it.key());
-    //            ui->friendList->addItem(item);
-    //        }
-    //    }
+    if (!arg1.isEmpty()) {
+        QMap<int, QString> result;
+        for (QMap<int, QString>::const_iterator it = availibleUsers.begin();
+             it != availibleUsers.end(); ++it) {
+            if (isMatch(it.value(), arg1)) {
+                result.insert(it.key(), it.value());
+            }
+        }
+        QMap<int, QString> tmp = result;
+        renderUsers(tmp);
+    } else {
+        renderUsers(contacts);
+    }
 }

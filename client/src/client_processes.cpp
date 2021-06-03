@@ -209,6 +209,59 @@ bool Client::getUserList(QMap<int, QString> &userList, int chatId) {
     return method == sentMethod && status == 200;
 }
 
+bool Client::getContactList(QMap<int, QString> &contactList) {
+    Q_ASSERT(!responseObj.has_value());
+    QJsonObject message;
+    QString sentMethod = "getContactList";
+    QJsonObject requestObj =
+        getJsonRequestInstance(sentMethod, std::move(message));
+
+    sendRequest(requestObj);
+
+    if (!responseObj.has_value()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
+
+    QJsonArray responseArray =
+        responseBody.value("message").toObject().value("content").toArray();
+    responseObj.reset();
+    for (auto user_it : responseArray) {
+        int user_id = user_it.toObject().value("user_id").toInt();
+        QString user_name = user_it.toObject().value("user_name").toString();
+        contactList[user_id] = user_name;
+    }
+
+    return method == sentMethod && status == 200;
+}
+
+bool Client::addUserContact(int userId) {
+    Q_ASSERT(!responseObj.has_value());
+    QJsonObject message;
+    message["contactUserId"] = userId;
+
+    QString sentMethod = "addUserContact";
+    QJsonObject requestObj =
+        getJsonRequestInstance(sentMethod, std::move(message));
+
+    sendRequest(requestObj);
+
+    if (!responseObj.has_value()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
+    responseObj.reset();
+
+    return method == sentMethod && status == 200;
+}
+
 bool Client::updateUserPhoto(QImage &photo) {
     QJsonObject message;
     message["content"] = imageToBase64(photo);
@@ -230,9 +283,10 @@ bool Client::updateUserPhoto(QImage &photo) {
     return method == sentMethod && status == 200;
 }
 
-bool Client::getUserPhoto(QImage &photo) {
+bool Client::getUserPhoto(QImage &photo, int userId = -1) {
     qDebug() << "here";
     QJsonObject message;
+    message["userId"] = userId;
 
     QString sentMethod = "getUserPhoto";
     QJsonObject requestObj =

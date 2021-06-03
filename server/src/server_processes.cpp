@@ -277,6 +277,61 @@ void Server::processGetUserList(QJsonObject requestBody, QWebSocket *pSender) {
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
 
+void Server::processGetContactList(QJsonObject requestBody,
+                                   QWebSocket *pSender) {
+    if (!isAuthorized(requestBody, pSender)) {
+        return;
+    }
+    // if user in chat
+
+    int userId = authenticatedUsers[pSender].id;
+
+    QJsonArray contentArray;
+    /* Filling contentArray */ {
+        QList<User> contactList = db.getUserContacts(userId);
+        for (QList<User>::iterator user_it = contactList.begin();
+             user_it != contactList.end(); ++user_it) {
+            QJsonObject chatItem;
+            chatItem["user_id"] = user_it->id;
+            chatItem["user_name"] = user_it->login;
+            contentArray.append(chatItem);
+        }
+    }
+
+    QJsonObject responseObj = getJsonResponseInstance(
+        requestBody.value("method").toString(), std::move(contentArray), 200);
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+
+    if (m_debug) {
+        qDebug("processGetUserList response: %s\n",
+               qUtf8Printable(responseBinaryMessage));
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
+void Server::processAddUserContact(QJsonObject requestBody,
+                                   QWebSocket *pSender) {
+    if (!isAuthorized(requestBody, pSender)) {
+        return;
+    }
+    // if user in chat
+
+    int userId = authenticatedUsers[pSender].id;
+    int contactUserId =
+        requestBody.value("message").toObject().value("contactUserId").toInt();
+
+    db.addUserContact(userId, contactUserId);
+
+    QJsonObject responseObj =
+        getJsonResponseInstance(requestBody.value("method").toString(), 200);
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
 void Server::processUpdateUserPhoto(QJsonObject requestBody,
                                     QWebSocket *pSender) {
     if (!isAuthorized(requestBody, pSender)) {
@@ -294,10 +349,17 @@ void Server::processUpdateUserPhoto(QJsonObject requestBody,
     }
 
     // TODO: сделать запись в БД
-    saveImage(image, QString("user_original_%1").arg(userId));
+    int status = 200;
+    try {
+        saveImage(image, QString("user_original_%1").arg(userId));
+    } catch (const std::exception &e) {
+        status = 500;
+        qDebug() << "exception " << e.what() << " while saving photo";
+    }
+    qDebug() << "Photo successfully saved";
 
     QJsonObject responseObj =
-        getJsonResponseInstance(requestBody.value("method").toString(), 200);
+        getJsonResponseInstance(requestBody.value("method").toString(), status);
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {
@@ -311,13 +373,19 @@ void Server::processGetUserPhoto(QJsonObject requestBody, QWebSocket *pSender) {
         return;
     }
 
-    int userId = authenticatedUsers[pSender].id;
+    int userId =
+        requestBody.value("message").toObject().value("userId").toInt();
+    if (userId == -1) {
+        userId = authenticatedUsers[pSender].id;
+    }
 
     // TODO: читать путь из БД
     QImage photo;
     try {
         photo = loadImage(QString("user_original_%1").arg(userId));
-    } catch (...) {
+    } catch (const std::exception &e) {
+        qDebug() << "photo not found, using default with exception "
+                 << e.what();
         photo = QImage(256, 256, QImage::Format_RGB32);
         photo.fill(Qt::blue);
     }
@@ -334,8 +402,5 @@ void Server::processGetUserPhoto(QJsonObject requestBody, QWebSocket *pSender) {
         requestBody.value("method").toString(), std::move(message), 200);
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
-    if (m_debug) {
-        qDebug() << "response" << responseBinaryMessage;
-    }
     pSender->sendBinaryMessage(responseBinaryMessage);
 }

@@ -57,7 +57,7 @@ private slots:
 
     void on_messages_clicked();
 
-    void on_friendList_itemDoubleClicked(QListWidgetItem *item);
+    void on_friendList_itemClicked(QListWidgetItem *item);
 
     void on_addFriend_clicked();
 
@@ -68,6 +68,7 @@ private:
     void onConnectionUnstable();
     void updateChats();
     void updateUsers();
+    void renderUsers(const QMap<int, QString> &userList);
     void updateUserProfile(int id, QString name);
     void renderChats(const QMap<int, QSharedPointer<Chat>> &);
 
@@ -75,5 +76,6 @@ private:
     Client client;
     QMap<int, QSharedPointer<Chat>> availableChats;
     QMap<int, QString> availibleUsers;
+    QMap<int, QString> contacts;
 };
 #endif  // MAINWINDOW_H

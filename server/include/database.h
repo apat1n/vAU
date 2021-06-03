@@ -29,6 +29,8 @@ public:
     QList<Chat> getChatList(User &user);
     QList<Message> getMessageList(int chatId);
     QMap<int, QString> getUserList(int chatId);
+    QList<User> getUserContacts(int user_id);
+    bool addUserContact(int user_id1, int user_id2);
 };
 
 #endif  // DATABASE_H

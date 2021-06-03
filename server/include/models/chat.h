@@ -8,6 +8,7 @@
 struct Chat {
     int id;
     QString name;
+    bool is_group;
     QDate lastUpdated;
 };
 

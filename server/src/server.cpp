@@ -84,6 +84,10 @@ void Server::processBinaryMessage(QByteArray message) {
         processUpdateUserPhoto(requestBody, pSender);
     } else if (requestMethod == "getUserPhoto") {
         processGetUserPhoto(requestBody, pSender);
+    } else if (requestMethod == "getContactList") {
+        processGetContactList(requestBody, pSender);
+    } else if (requestMethod == "addUserContact") {
+        processAddUserContact(requestBody, pSender);
     }
 }
 
