@@ -132,7 +132,10 @@ bool Client::loginUser(QString login, QString password) {
     Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["login"] = login;
-    message["password"] = password;
+    message["password"] =
+        QString(QCryptographicHash::hash(password.toUtf8(),
+                                         QCryptographicHash::RealSha3_256)
+                    .toBase64());
 
     QString sentMethod = "login";
     QJsonObject requestObj =
@@ -156,7 +159,10 @@ bool Client::registerUser(QString login, QString password) {
     Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["login"] = login;
-    message["password"] = password;
+    message["password"] =
+        QString(QCryptographicHash::hash(password.toUtf8(),
+                                         QCryptographicHash::RealSha3_256)
+                    .toBase64());
 
     QString sentMethod = "register";
     QJsonObject requestObj =
