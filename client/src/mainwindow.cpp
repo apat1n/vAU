@@ -48,7 +48,7 @@ void MainWindow::on_signIn_clicked() {
         // update contacts and chats
         client.getUserList(availibleUsers);
         client.getContactList(contacts);
-
+        crunch = login;
         ui->stackedWidget->setCurrentIndex(1);
         ui->menuLog_Out->menuAction()->setVisible(true);
         updateChats();
@@ -64,10 +64,9 @@ void MainWindow::on_registerButton_clicked() {
     QString password = ui->inputPassword->text();
 
     if (client.registerUser(login, password)) {
-        // update contacts and chats
         client.getUserList(availibleUsers);
         client.getContactList(contacts);
-
+        crunch = login;
         ui->menuLog_Out->menuAction()->setVisible(true);
         updateChats();
         ui->stackedWidget->setCurrentIndex(1);
@@ -243,6 +242,7 @@ void MainWindow::on_actionLog_Out_triggered() {
 void MainWindow::on_actionMy_Profile_triggered() {
     ui->stackedWidget_3->setCurrentIndex(1);
     QImage icon = getUserImage(client.getId(), client);
+    ui->label_3->setText(crunch);
     ui->label->setPixmap(QPixmap::fromImage(icon));
     ui->label_2->setText(getUserStatus(client.getId()));
     QFont font = ui->label_3->font();
@@ -295,6 +295,7 @@ void MainWindow::updateUserProfile(int id, QString name) {
 }
 
 void MainWindow::on_messages_clicked() {
+    updateChats();
     ui->stackedWidget_2->setCurrentIndex(0);
 }
 
@@ -308,6 +309,7 @@ void MainWindow::on_addFriend_clicked() {
     ui->label_4->setText("Your request was sent");
     ui->addFriend->hide();
     client.addUserContact(userId);
+    client.getContactList(contacts);
 }
 
 void MainWindow::on_actionChange_my_photo_triggered() {
@@ -316,6 +318,7 @@ void MainWindow::on_actionChange_my_photo_triggered() {
     QImage icon = QImage(newPhoto).scaled(256, 256);
     ui->label->setPixmap(QPixmap::fromImage(icon));
     ui->label_2->setText(getUserStatus(client.getId()));
+    ui->label_3->setText(crunch);
     QFont font = ui->label_3->font();
     font.setPointSize(24);
     ui->label_3->setFont(font);

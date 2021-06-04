@@ -64,7 +64,7 @@ static void clearListWidget(QListWidget *listWidget) {
 }
 
 static QString getUserStatus(int id) {
-    return "_status_";
+    return "";
 }
 
 static QIcon getChatImage(int id) {
