@@ -13,7 +13,7 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->errorLogin->hide();
     ui->errorRegister->hide();
     client.connectServer();
-    QFile file(":/styles/light.qss");
+    QFile file(":/styles/light/style.qss");
     file.open(QFile::ReadOnly);
     QString styleSheet = QLatin1String(file.readAll());
     qApp->setStyleSheet(styleSheet);
@@ -206,12 +206,12 @@ void MainWindow::inviteUser(int id) {
 
 void MainWindow::on_actionDark_Theme_triggered() {
     if (ui->actionDark_Theme->isChecked()) {
-        QFile file(":/styles/dark.qss");
+        QFile file(":/styles/dark/style.qss");
         file.open(QFile::ReadOnly);
         QString styleSheet = QLatin1String(file.readAll());
         qApp->setStyleSheet(styleSheet);
     } else {
-        QFile file(":/styles/light.qss");
+        QFile file(":/styles/light/style.qss");
         file.open(QFile::ReadOnly);
         QString styleSheet = QLatin1String(file.readAll());
         qApp->setStyleSheet(styleSheet);

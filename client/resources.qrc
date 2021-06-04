@@ -1,6 +1,10 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file>styles/dark.qss</file>
-    <file>styles/light.qss</file>
+    <file>styles/dark/style.qss</file>
+    <file>styles/dark/checkbox_unchecked.png</file>
+    <file>styles/dark/checkbox_checked.png</file>
+    <file>styles/light/style.qss</file>
+    <file>styles/light/checkbox_unchecked.png</file>
+    <file>styles/light/checkbox_checked.png</file>
 </qresource>
 </RCC>
