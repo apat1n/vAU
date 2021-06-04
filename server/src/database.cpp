@@ -103,7 +103,6 @@ QList<Message> Database::getMessageList(int chatId) {
     return result;
 }
 
-
 bool Database::createChat(QString name, int user_id, int &chat_id) {
     QSqlQuery query(db);
     std::stringstream ss;

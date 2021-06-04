@@ -234,6 +234,16 @@ void MainWindow::on_actionMy_Profile_triggered() {
     QImage icon = getUserImage(client.getId(), client);
     ui->label->setPixmap(QPixmap::fromImage(icon));
     ui->label_2->setText(getUserStatus(client.getId()));
+    QFont font = ui->label_3->font();
+    font.setPointSize(24);
+    ui->label_3->setFont(font);
+    font = ui->label_2->font();
+    font.setPointSize(12);
+    ui->label_2->setFont(font);
+
+    ui->label_4->hide();
+
+    ui->addFriend->hide();
 }
 
 void MainWindow::on_createChatButton_clicked() {
@@ -257,6 +267,7 @@ void MainWindow::on_friends_clicked() {
 void MainWindow::updateUserProfile(int id, QString name) {
     QImage icon = getUserImage(id, client);
     ui->label->setPixmap(QPixmap::fromImage(icon));
+    ui->label_4->show();
     QFont font = ui->label_3->font();
     font.setPointSize(24);
     ui->label_3->setFont(font);
@@ -293,8 +304,20 @@ void MainWindow::on_addFriend_clicked() {
 void MainWindow::on_actionChange_my_photo_triggered() {
     QString newPhoto = QFileDialog::getOpenFileName(
         this, "Upload a photo", "/home", "*.jpg *.png *.bmp");
-    //    ui->stackedWidget_3->setCurrentIndex(1);
     QImage icon = QImage(newPhoto).scaled(256, 256);
+    ui->label->setPixmap(QPixmap::fromImage(icon));
+    ui->label_2->setText(getUserStatus(client.getId()));
+    QFont font = ui->label_3->font();
+    font.setPointSize(24);
+    ui->label_3->setFont(font);
+    font = ui->label_2->font();
+    font.setPointSize(12);
+    ui->label_2->setFont(font);
+
+    ui->label_4->hide();
+
+    ui->addFriend->hide();
+    ui->stackedWidget_3->setCurrentIndex(1);
     client.updateUserPhoto(icon);
 }
 
