@@ -212,3 +212,18 @@ bool Database::addUserContact(int user_id1, int user_id2) {
 
     return query.exec(QString::fromStdString(ss.str()));
 }
+
+bool Database::inviteUserChat(int user_id, int chat_id) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+
+    ss << "INSERT INTO QChatUserList (chat_id, user_id) VALUES (" << chat_id
+       << ", " << user_id << ");";
+
+    if (m_debug) {
+        qDebug() << QString::fromStdString(ss.str());
+    }
+
+    return query.exec(QString::fromStdString(ss.str()));
+}
+

@@ -88,6 +88,8 @@ void Server::processBinaryMessage(QByteArray message) {
         processGetContactList(requestBody, pSender);
     } else if (requestMethod == "addUserContact") {
         processAddUserContact(requestBody, pSender);
+    } else if (requestMethod == "inviteUserChat") {
+        processInviteUserChat(requestBody, pSender);
     }
 }
 

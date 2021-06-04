@@ -404,3 +404,27 @@ void Server::processGetUserPhoto(QJsonObject requestBody, QWebSocket *pSender) {
 
     pSender->sendBinaryMessage(responseBinaryMessage);
 }
+
+void Server::processInviteUserChat(QJsonObject requestBody,
+                                   QWebSocket *pSender) {
+    if (!isAuthorized(requestBody, pSender)) {
+        return;
+    }
+    // if user in chat
+
+    int userId =
+        requestBody.value("message").toObject().value("userId").toInt();
+    int chatId =
+        requestBody.value("message").toObject().value("chatId").toInt();
+
+    db.inviteUserChat(userId, chatId);
+
+    QJsonObject responseObj =
+        getJsonResponseInstance(requestBody.value("method").toString(), 200);
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
