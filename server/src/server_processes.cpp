@@ -172,15 +172,19 @@ void Server::processCreateChatRequest(QJsonObject requestBody,
 
     QJsonObject responseObj;
     int chat_id = 0;
+
     if (db.createChat(name, user_id, chat_id)) {
         QJsonObject content;
         content["chat_id"] = chat_id;
+
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), std::move(content), 200);
+
     } else {
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), 401);
     }
+
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
 
     if (m_debug) {
@@ -421,13 +425,28 @@ void Server::processInviteUserChat(QJsonObject requestBody,
         requestBody.value("message").toObject().value("chatId").toInt();
 
     db.inviteUserChat(userId, chatId);
+    QJsonObject message;
+    message["pushChat"] = 1;
 
     QJsonObject responseObj =
         getJsonResponseInstance(requestBody.value("method").toString(), 200);
+    QJsonObject responsePushObj = getJsonResponseInstance(
+        requestBody.value("method").toString(), std::move(message), 200);
+
     QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+    QByteArray responsePushBinaryMessage =
+        QJsonDocument(responsePushObj).toJson();
+
+    if (authenticatedUsersId.contains(userId)) {
+        if (authenticatedUsersId[userId] != pSender) {
+            authenticatedUsersId[userId]->sendBinaryMessage(
+                responsePushBinaryMessage);
+        }
+    }
 
     if (m_debug) {
         qDebug() << "response" << responseBinaryMessage;
     }
+
     pSender->sendBinaryMessage(responseBinaryMessage);
 }

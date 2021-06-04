@@ -59,10 +59,10 @@ private slots:
 
     void on_searchFriends_textEdited(const QString &arg1);
     void renderMessages(int chat_id);
+    void updateChats();
 
 private:
     void onConnectionUnstable();
-    void updateChats();
     void updateUsers();
     void renderUsers(const QMap<int, QString> &userList);
     void updateUserProfile(int id, QString name);

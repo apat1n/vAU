@@ -32,6 +32,8 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->stackedWidget_3->setCurrentIndex(0);
     connect(&client, &Client::responsePushMessageReceived, this,
             &MainWindow::renderMessages);
+    connect(&client, &Client::responsePushChatMessageReceived, this,
+            &MainWindow::updateChats);
 }
 
 MainWindow::~MainWindow() {

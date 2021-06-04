@@ -26,6 +26,7 @@ Q_SIGNALS:
     void responseRecieved();
     void connectionUnstable();
     void responsePushMessageReceived(int chat_id);
+    void responsePushChatMessageReceived();
 
 private Q_SLOTS:
     void onConnected();
