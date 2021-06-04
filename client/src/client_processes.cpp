@@ -26,7 +26,7 @@ bool Client::sendMessage(const QSharedPointer<Message> &messageObj,
     return method == sentMethod && status == 200;
 }
 
-bool Client::createChat(QString name) {
+bool Client::createChat(QString name, int &chat_id) {
     Q_ASSERT(!responseObj.has_value());
     QJsonObject message;
     message["name"] = name;
@@ -42,6 +42,13 @@ bool Client::createChat(QString name) {
     QJsonObject responseBody = responseObj->value("response").toObject();
     QString method = responseBody.value("method").toString();
     int status = responseBody.value("status").toInt();
+    chat_id = responseBody.value("message")
+                  .toObject()
+                  .value("content")
+                  .toObject()
+                  .value("chat_id")
+                  .toInt();
+
     responseObj.reset();
 
     return method == sentMethod && status == 200;
@@ -316,6 +323,30 @@ bool Client::getUserPhoto(QImage &photo, int userId = -1) {
     if (m_debug) {
         qDebug() << "Get image with size" << photo.size();
     }
+
+    responseObj.reset();
+
+    return method == sentMethod && status == 200;
+}
+
+bool Client::inviteUserChat(int user_id, int chat_id) {
+    QJsonObject message;
+    message["userId"] = user_id;
+    message["chatId"] = chat_id;
+
+    QString sentMethod = "inviteUserChat";
+
+    QJsonObject requestObj =
+        getJsonRequestInstance(sentMethod, std::move(message));
+
+    sendRequest(requestObj);
+    if (responseObj->empty()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
 
     responseObj.reset();
 

@@ -155,8 +155,12 @@ void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
     }
 }
 
-void MainWindow::newChat(QString name) {
-    if (client.createChat(name)) {
+void MainWindow::newChat(QString name, const QList<int> &user_list) {
+    int chat_id = 0;
+    if (client.createChat(name, chat_id)) {
+        for (auto it : user_list) {
+            client.inviteUserChat(it, chat_id);
+        }
         updateChats();
     }
 }
@@ -236,10 +240,11 @@ void MainWindow::on_createChatButton_clicked() {
     QMap<int, QString> users;
     client.getUserList(users);
     Dialog creating(client, users);
-    connect(&creating, SIGNAL(requestAddUser(int)), this,
-            SLOT(inviteUser(int)));
-    connect(&creating, SIGNAL(requestCreating(const QString &)), this,
-            SLOT(newChat(const QString &)));
+    connect(&creating,
+            SIGNAL(requestCreating(const QString &, const QList<int> &)), this,
+            SLOT(newChat(const QString &, const QList<int> &)));
+    //    connect(&creating, SIGNAL(requestAddUser(int)), this,
+    //            SLOT(inviteUser(int)));
 
     creating.exec();
 }
