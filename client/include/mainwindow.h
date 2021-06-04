@@ -39,7 +39,7 @@ private slots:
 
     void on_createChatButton_clicked();
 
-    void newChat(QString name);
+    void newChat(QString name, const QList<int> &);
 
     void on_actionDark_Theme_triggered();
 

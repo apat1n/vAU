@@ -171,9 +171,12 @@ void Server::processCreateChatRequest(QJsonObject requestBody,
     int user_id = authenticatedUsers[pSender].id;
 
     QJsonObject responseObj;
-    if (db.createChat(name, user_id)) {
+    int chat_id = 0;
+    if (db.createChat(name, user_id, chat_id)) {
+        QJsonObject content;
+        content["chat_id"] = chat_id;
         responseObj = getJsonResponseInstance(
-            requestBody.value("method").toString(), 200);
+            requestBody.value("method").toString(), std::move(content), 200);
     } else {
         responseObj = getJsonResponseInstance(
             requestBody.value("method").toString(), 401);

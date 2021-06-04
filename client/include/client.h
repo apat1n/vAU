@@ -44,7 +44,7 @@ public:
     int getId() const;
     bool sendMessage(const QSharedPointer<Message> &, int);
     bool logoutUser();
-    bool createChat(QString name);
+    bool createChat(QString name, int &chat_id);
     bool getChatList(QMap<int, QSharedPointer<Chat>> &chatList);
     bool getChatMessages(int chatId,
                          QList<QSharedPointer<Message>> &messageHistory);
@@ -56,6 +56,7 @@ public:
     bool updateUserPhoto(QImage &photo);
     bool getUserPhoto(QImage &photo, int userId);
     bool getContactList(QMap<int, QString> &);
+    bool inviteUserChat(int user_id, int chat_id);
     bool addUserContact(int userId);
 };
 

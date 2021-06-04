@@ -24,14 +24,14 @@ public:
     bool authUser(User &user, QString password);
     bool registerUser(QString login, QString password);
 
-    bool createChat(QString name, int user_id);
+    bool createChat(QString name, int user_id, int &chat_id);
     bool createMessage(int chat_id, int user_id, QString message, QDate date);
     QList<Chat> getChatList(User &user);
     QList<Message> getMessageList(int chatId);
     QMap<int, QString> getUserList(int chatId);
     QList<User> getUserContacts(int user_id);
     bool addUserContact(int user_id1, int user_id2);
-    bool inviteUserChat(int user_id1, int user_id2);
+    bool inviteUserChat(int user_id, int chat_id);
 };
 
 #endif  // DATABASE_H

@@ -103,7 +103,7 @@ QList<Message> Database::getMessageList(int chatId) {
     return result;
 }
 
-bool Database::createChat(QString name, int user_id) {
+bool Database::createChat(QString name, int user_id, int chat_id) {
     QSqlQuery query(db);
     std::stringstream ss;
 
@@ -115,7 +115,7 @@ bool Database::createChat(QString name, int user_id) {
     }
 
     if (query.exec(QString::fromStdString(ss.str()))) {
-        int chat_id = query.lastInsertId().toInt();
+        chat_id = query.lastInsertId().toInt();
         ss.str("");  // clear query string
         ss << "INSERT INTO QChatUserList (chat_id, user_id) VALUES (" << chat_id
            << ", " << user_id << ");";
@@ -226,4 +226,3 @@ bool Database::inviteUserChat(int user_id, int chat_id) {
 
     return query.exec(QString::fromStdString(ss.str()));
 }
-
