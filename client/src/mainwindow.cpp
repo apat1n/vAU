@@ -13,10 +13,16 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->errorLogin->hide();
     ui->errorRegister->hide();
     client.connectServer();
+
+    // load stylesheet
     QFile file(":/styles/light/style.qss");
     file.open(QFile::ReadOnly);
     QString styleSheet = QLatin1String(file.readAll());
     qApp->setStyleSheet(styleSheet);
+
+    // remove cached images
+    QDir(QDir::currentPath() + "/" + "images").removeRecursively();
+
     ui->messageTextField->hide();
     ui->inputPassword->setEchoMode(QLineEdit::Password);
     ui->menuLog_Out->menuAction()->setVisible(false);
@@ -37,6 +43,10 @@ void MainWindow::on_signIn_clicked() {
     QString password = ui->inputPassword->text();
 
     if (client.loginUser(login, password)) {
+        // update contacts and chats
+        client.getUserList(availibleUsers);
+        client.getContactList(contacts);
+
         ui->stackedWidget->setCurrentIndex(1);
         ui->menuLog_Out->menuAction()->setVisible(true);
         updateChats();
@@ -52,6 +62,10 @@ void MainWindow::on_registerButton_clicked() {
     QString password = ui->inputPassword->text();
 
     if (client.registerUser(login, password)) {
+        // update contacts and chats
+        client.getUserList(availibleUsers);
+        client.getContactList(contacts);
+
         ui->menuLog_Out->menuAction()->setVisible(true);
         updateChats();
         ui->stackedWidget->setCurrentIndex(1);
@@ -95,7 +109,6 @@ void MainWindow::on_search_textEdited(const QString &searchRequest) {
 }
 
 void MainWindow::renderChats(const QMap<int, QSharedPointer<Chat>> &chatsList) {
-    // client.getUserList(availibleUsers);
     clearListWidget(ui->chatMenu);
 
     for (QMap<int, QSharedPointer<Chat>>::const_iterator it =
@@ -204,10 +217,6 @@ void MainWindow::renderUsers(const QMap<int, QString> &userList) {
     }
 }
 
-void MainWindow::inviteUser(int id) {
-    qDebug() << id;
-}
-
 void MainWindow::on_actionDark_Theme_triggered() {
     if (ui->actionDark_Theme->isChecked()) {
         QFile file(":/styles/dark/style.qss");
@@ -249,12 +258,10 @@ void MainWindow::on_actionMy_Profile_triggered() {
 void MainWindow::on_createChatButton_clicked() {
     QMap<int, QString> users;
     client.getUserList(users);
-    Dialog creating(client, users);
+    Dialog creating(client, contacts);
     connect(&creating,
             SIGNAL(requestCreating(const QString &, const QList<int> &)), this,
             SLOT(newChat(const QString &, const QList<int> &)));
-    //    connect(&creating, SIGNAL(requestAddUser(int)), this,
-    //            SLOT(inviteUser(int)));
 
     creating.exec();
 }

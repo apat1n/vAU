@@ -73,25 +73,37 @@ static QIcon getChatImage(int id) {
     return QIcon(pixmap);
 }
 
-static QImage getUserImage(int id, Client &client) {
-    QImage photo;
-    if (!client.getUserPhoto(photo, id)) {
-        photo = QImage(256, 256, QImage::Format_RGB32);
-        photo.fill(Qt::blue);
-    }
-    return photo;
-}
-
 static void saveImage(const QImage &image, const QString &filename) {
     QDir dirPath = QDir::currentPath() + "/" + "images";
     if (!dirPath.exists()) {
         dirPath.mkpath(".");
     }
-    image.save(dirPath.absolutePath() + "/" + filename);
+    image.save(dirPath.absolutePath() + "/" + filename, "PNG");
 }
 
 static QImage loadImage(const QString &filename) {
-    return QImage(QDir::currentPath() + "/" + "images" + "/" + filename);
+    QString filePath = QDir::currentPath() + "/" + "images" + "/" + filename;
+    if (!QFile::exists(filePath)) {
+        throw std::runtime_error("no such image!");
+    }
+    return QImage(filePath);
+}
+
+static QImage getUserImage(int id, Client &client) {
+    QImage photo;
+    QString filePath = QString("user_original_%1").arg(id);
+    try {
+        photo = loadImage(filePath);
+        qDebug() << "load cached image";
+    } catch (const std::exception &e) {
+        qDebug() << "load image from server";
+        if (!client.getUserPhoto(photo, id)) {
+            photo = QImage(256, 256, QImage::Format_RGB32);
+            photo.fill(Qt::blue);
+        }
+        saveImage(photo, filePath);
+    }
+    return photo;
 }
 
 /*

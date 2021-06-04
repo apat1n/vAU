@@ -49,10 +49,6 @@ private slots:
 
     void on_actionChange_my_photo_triggered();
 
-    void inviteUser(int id);
-    // todo: потом сделать этот метод или что-нибудь в этом роде) и кстати у
-    // чатов тоже кажется должен быть свой Id..
-
     void on_friends_clicked();
 
     void on_messages_clicked();

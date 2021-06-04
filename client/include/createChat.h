@@ -13,8 +13,6 @@ class Dialog : public QDialog {
 Q_SIGNALS:
     void requestCreating(QString name, const QList<int> &);
 
-    void requestAddUser(int id);
-
 public:
     explicit Dialog(Client &client,
                     QMap<int, QString> users_,
