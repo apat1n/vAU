@@ -9,6 +9,8 @@ Dialog::Dialog(Client &client, QMap<int, QString> users_, QWidget *parent)
     : QDialog(parent), ui(new Ui::Dialog), client(client) {
     ui->setupUi(this);
     ui->avaliableUsers->setIconSize(QSize(32, 32));
+    this->setWindowTitle("Create a new chat");
+
     QMap<int, QString>::iterator i;
     for (i = users_.begin(); i != users_.end(); i++) {
         QListWidgetItem *it = new QListWidgetItem;

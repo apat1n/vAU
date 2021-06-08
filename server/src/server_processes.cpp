@@ -27,7 +27,7 @@ void Server::processLoginRequest(QJsonObject requestBody, QWebSocket *pSender) {
     QString login = requestMessage.value("login").toString();
     QString password = requestMessage.value("password").toString();
 
-    User user{-1, login, pSender};
+    User user{-1, login, "", pSender};
 
     QJsonObject responseObj;
     if (db.authUser(user, password)) {
@@ -59,7 +59,7 @@ void Server::processRegisterRequest(QJsonObject requestBody,
 
     QJsonObject responseObj;
     if (db.registerUser(login, password)) {
-        User user = User({-1, login, pSender});
+        User user = User({-1, login, "", pSender});
         db.authUser(user, password);
         authenticatedUsers[pSender] = user;
         authenticatedUsersId[user.id] = pSender;
@@ -448,5 +448,80 @@ void Server::processInviteUserChat(QJsonObject requestBody,
         qDebug() << "response" << responseBinaryMessage;
     }
 
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
+void Server::processGetUserProfile(QJsonObject requestBody,
+                                   QWebSocket *pSender) {
+    if (!isAuthorized(requestBody, pSender)) {
+        return;
+    }
+
+    int userId =
+        requestBody.value("message").toObject().value("userId").toInt();
+    User profile = db.getUserProfile(userId);
+
+    QJsonObject content;
+    content["id"] = profile.id;
+    content["login"] = profile.login;
+    content["status"] = profile.status;
+
+    QJsonObject responseObj = getJsonResponseInstance(
+        requestBody.value("method").toString(), std::move(content), 200);
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
+void Server::processUpdateUserStatus(QJsonObject requestBody,
+                                     QWebSocket *pSender) {
+    if (!isAuthorized(requestBody, pSender)) {
+        return;
+    }
+
+    int userId = authenticatedUsers[pSender].id;
+    QString newStatus =
+        requestBody.value("message").toObject().value("status").toString();
+
+    int status = 200;
+    if (!db.updateUserStatus(userId, newStatus)) {
+        status = 500;
+    }
+
+    QJsonObject responseObj =
+        getJsonResponseInstance(requestBody.value("method").toString(), status);
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
+    pSender->sendBinaryMessage(responseBinaryMessage);
+}
+
+void Server::processUpdateUserLogin(QJsonObject requestBody,
+                                    QWebSocket *pSender) {
+    if (!isAuthorized(requestBody, pSender)) {
+        return;
+    }
+
+    int userId = authenticatedUsers[pSender].id;
+    QString newLogin =
+        requestBody.value("message").toObject().value("login").toString();
+
+    int status = 200;
+    if (!db.updateUserLogin(userId, newLogin)) {
+        status = 500;
+    }
+
+    QJsonObject responseObj =
+        getJsonResponseInstance(requestBody.value("method").toString(), status);
+    QByteArray responseBinaryMessage = QJsonDocument(responseObj).toJson();
+
+    if (m_debug) {
+        qDebug() << "response" << responseBinaryMessage;
+    }
     pSender->sendBinaryMessage(responseBinaryMessage);
 }

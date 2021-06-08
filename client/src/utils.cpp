@@ -63,7 +63,7 @@ static void clearListWidget(QListWidget *listWidget) {
     }
 }
 
-static QString getUserStatus(int id) {
+static QString getUserStatus(int id, Client &client) {
     return "";
 }
 

@@ -90,6 +90,12 @@ void Server::processBinaryMessage(QByteArray message) {
         processAddUserContact(requestBody, pSender);
     } else if (requestMethod == "inviteUserChat") {
         processInviteUserChat(requestBody, pSender);
+    } else if (requestMethod == "getUserProfile") {
+        processGetUserProfile(requestBody, pSender);
+    } else if (requestMethod == "updateUserStatus") {
+        processUpdateUserStatus(requestBody, pSender);
+    } else if (requestMethod == "updateUserLogin") {
+        processUpdateUserLogin(requestBody, pSender);
     }
 }
 

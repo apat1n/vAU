@@ -73,6 +73,5 @@ private:
     QMap<int, QSharedPointer<Chat>> availableChats;
     QMap<int, QString> availibleUsers;
     QMap<int, QString> contacts;
-    QString crunch;
 };
 #endif  // MAINWINDOW_H

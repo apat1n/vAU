@@ -32,6 +32,9 @@ public:
     QList<User> getUserContacts(int user_id);
     bool addUserContact(int user_id1, int user_id2);
     bool inviteUserChat(int user_id, int chat_id);
+    User getUserProfile(int user_id);
+    bool updateUserStatus(int user_id, QString status);
+    bool updateUserLogin(int user_id, QString login);
 };
 
 #endif  // DATABASE_H

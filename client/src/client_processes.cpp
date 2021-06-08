@@ -154,9 +154,12 @@ bool Client::loginUser(QString login, QString password) {
     }
 
     QJsonObject responseBody = responseObj->value("response").toObject();
+    QJsonObject responseMessage = responseBody.value("message").toObject();
+    QJsonObject content = responseMessage.value("content").toObject();
+    currId = content["id"].toInt();
+
     QString method = responseBody.value("method").toString();
     int status = responseBody.value("status").toInt();
-    currId = responseBody.value("id").toInt();
 
     responseObj.reset();
     return method == sentMethod && status == 200;
@@ -181,9 +184,12 @@ bool Client::registerUser(QString login, QString password) {
     }
 
     QJsonObject responseBody = responseObj->value("response").toObject();
+    QJsonObject responseMessage = responseBody.value("message").toObject();
+    QJsonObject content = responseMessage.value("content").toObject();
+    currId = content["id"].toInt();
+
     QString method = responseBody.value("method").toString();
     int status = responseBody.value("status").toInt();
-    currId = responseBody.value("id").toInt();
 
     responseObj.reset();
 
@@ -348,6 +354,35 @@ bool Client::inviteUserChat(int user_id, int chat_id) {
     QString method = responseBody.value("method").toString();
     int status = responseBody.value("status").toInt();
 
+    responseObj.reset();
+
+    return method == sentMethod && status == 200;
+}
+
+bool Client::getUserProfile(User &user, int user_id) {
+    QJsonObject message;
+    message["userId"] = user_id;
+
+    QString sentMethod = "getUserProfile";
+
+    QJsonObject requestObj =
+        getJsonRequestInstance(sentMethod, std::move(message));
+
+    sendRequest(requestObj);
+    if (responseObj->empty()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QJsonObject responseMessage = responseBody.value("message").toObject();
+    QJsonObject content = responseMessage.value("content").toObject();
+    QString method = responseBody.value("method").toString();
+
+    user.id = content["id"].toInt();
+    user.login = content["login"].toString();
+    user.status = content["status"].toString();
+
+    int status = responseBody.value("status").toInt();
     responseObj.reset();
 
     return method == sentMethod && status == 200;

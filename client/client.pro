@@ -24,7 +24,8 @@ HEADERS += \
     include/client.h \
     include/createChat.h \
     include/mainwindow.h \
-    include/message.h
+    include/message.h \
+    include/user.h
 
 FORMS += \
     ui/mainwindow.ui \

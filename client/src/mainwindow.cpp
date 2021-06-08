@@ -13,6 +13,7 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->errorLogin->hide();
     ui->errorRegister->hide();
     client.connectServer();
+    this->setWindowTitle("vAU");
 
     // load stylesheet
     QFile file(":/styles/light/style.qss");
@@ -48,7 +49,6 @@ void MainWindow::on_signIn_clicked() {
         // update contacts and chats
         client.getUserList(availibleUsers);
         client.getContactList(contacts);
-        crunch = login;
         ui->stackedWidget->setCurrentIndex(1);
         ui->menuLog_Out->menuAction()->setVisible(true);
         updateChats();
@@ -66,7 +66,6 @@ void MainWindow::on_registerButton_clicked() {
     if (client.registerUser(login, password)) {
         client.getUserList(availibleUsers);
         client.getContactList(contacts);
-        crunch = login;
         ui->menuLog_Out->menuAction()->setVisible(true);
         updateChats();
         ui->stackedWidget->setCurrentIndex(1);
@@ -242,9 +241,11 @@ void MainWindow::on_actionLog_Out_triggered() {
 void MainWindow::on_actionMy_Profile_triggered() {
     ui->stackedWidget_3->setCurrentIndex(1);
     QImage icon = getUserImage(client.getId(), client);
-    ui->label_3->setText(crunch);
     ui->label->setPixmap(QPixmap::fromImage(icon));
-    ui->label_2->setText(getUserStatus(client.getId()));
+    User profile;
+    client.getUserProfile(profile, client.getId());
+    ui->label_2->setText(profile.status);
+    ui->label_3->setText(profile.login);
     QFont font = ui->label_3->font();
     font.setPointSize(24);
     ui->label_3->setFont(font);
@@ -283,8 +284,10 @@ void MainWindow::updateUserProfile(int id, QString name) {
     font = ui->label_2->font();
     font.setPointSize(12);
     ui->label_2->setFont(font);
-    ui->label_2->setText(getUserStatus(id));
-    ui->label_3->setText(name);
+    User profile;
+    client.getUserProfile(profile, id);
+    ui->label_2->setText(profile.status);
+    ui->label_3->setText(profile.login);
     if (contacts.contains(id)) {
         ui->label_4->setText("This user is already your friend");
         ui->addFriend->hide();
@@ -317,8 +320,10 @@ void MainWindow::on_actionChange_my_photo_triggered() {
         this, "Upload a photo", "/home", "*.jpg *.png *.bmp");
     QImage icon = QImage(newPhoto).scaled(256, 256);
     ui->label->setPixmap(QPixmap::fromImage(icon));
-    ui->label_2->setText(getUserStatus(client.getId()));
-    ui->label_3->setText(crunch);
+    User profile;
+    client.getUserProfile(profile, client.getId());
+    ui->label_2->setText(profile.status);
+    ui->label_3->setText(profile.login);
     QFont font = ui->label_3->font();
     font.setPointSize(24);
     ui->label_3->setFont(font);
