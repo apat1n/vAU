@@ -61,8 +61,8 @@ public:
     bool inviteUserChat(int user_id, int chat_id);
     bool addUserContact(int userId);
     bool getUserProfile(User &user, int user_id);
-    //    bool updateUserStatus(QString status);
-    //    bool updateUserLogin(QString login);
+    bool updateUserStatus(QString newStatus);
+    bool updateUserLogin(QString newLogin);
 };
 
 #endif  // ECHOCLIENT_H

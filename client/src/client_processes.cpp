@@ -387,3 +387,47 @@ bool Client::getUserProfile(User &user, int user_id) {
 
     return method == sentMethod && status == 200;
 }
+
+bool Client::updateUserStatus(QString newStatus) {
+    QJsonObject message;
+    message["status"] = newStatus;
+
+    QString sentMethod = "updateUserStatus";
+
+    QJsonObject requestObj =
+        getJsonRequestInstance(sentMethod, std::move(message));
+
+    sendRequest(requestObj);
+    if (responseObj->empty()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
+    responseObj.reset();
+
+    return method == sentMethod && status == 200;
+}
+
+bool Client::updateUserLogin(QString newLogin) {
+    QJsonObject message;
+    message["login"] = newLogin;
+
+    QString sentMethod = "updateUserLogin";
+
+    QJsonObject requestObj =
+        getJsonRequestInstance(sentMethod, std::move(message));
+
+    sendRequest(requestObj);
+    if (responseObj->empty()) {
+        return false;
+    }
+
+    QJsonObject responseBody = responseObj->value("response").toObject();
+    QString method = responseBody.value("method").toString();
+    int status = responseBody.value("status").toInt();
+    responseObj.reset();
+
+    return method == sentMethod && status == 200;
+}
