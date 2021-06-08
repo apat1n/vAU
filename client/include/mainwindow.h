@@ -49,6 +49,8 @@ private slots:
 
     void on_actionChange_my_photo_triggered();
 
+    void on_actionUpdate_my_profile_triggered();
+
     void on_friends_clicked();
 
     void on_messages_clicked();
@@ -58,8 +60,14 @@ private slots:
     void on_addFriend_clicked();
 
     void on_searchFriends_textEdited(const QString &arg1);
+
     void renderMessages(int chat_id);
+
     void updateChats();
+
+    void updateLogin(QString login);
+
+    void updateStatus(QString status);
 
 private:
     void onConnectionUnstable();

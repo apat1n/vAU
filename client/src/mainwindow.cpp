@@ -5,6 +5,7 @@
 #include <utility>
 #include "createChat.h"
 #include "ui_mainwindow.h"
+#include "updateprofile.h"
 #include "utils.cpp"
 
 MainWindow::MainWindow(const QString &server_url, QWidget *parent)
@@ -229,6 +230,25 @@ void MainWindow::on_actionDark_Theme_triggered() {
         QString styleSheet = QLatin1String(file.readAll());
         qApp->setStyleSheet(styleSheet);
     }
+}
+
+void MainWindow::on_actionUpdate_my_profile_triggered() {
+    User profile;
+    client.getUserProfile(profile, client.getId());
+    updateProfile p(profile.login, profile.status);
+    connect(&p, SIGNAL(requestChangeLogin(QString)), this,
+            SLOT(updateLogin(QString)));
+    connect(&p, SIGNAL(requestChangeStatus(QString)), this,
+            SLOT(updateStatus(QString)));
+    p.exec();
+}
+
+void MainWindow::updateLogin(QString login) {
+    client.updateUserLogin(login);
+}
+
+void MainWindow::updateStatus(QString status) {
+    client.updateUserStatus(status);
 }
 
 void MainWindow::on_actionLog_Out_triggered() {

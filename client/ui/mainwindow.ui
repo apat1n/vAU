@@ -318,6 +318,7 @@
     <addaction name="actionLog_Out"/>
     <addaction name="actionMy_Profile"/>
     <addaction name="actionChange_my_photo"/>
+    <addaction name="actionUpdate_my_profile"/>
    </widget>
    <addaction name="menuSettings"/>
    <addaction name="menuLog_Out"/>
@@ -343,6 +344,11 @@
   <action name="actionChange_my_photo">
    <property name="text">
     <string>Change my photo</string>
+   </property>
+  </action>
+  <action name="actionUpdate_my_profile">
+   <property name="text">
+    <string>Update my profile</string>
    </property>
   </action>
  </widget>
