@@ -56,8 +56,9 @@ bool Database::registerUser(QString login, QString password) {
 QList<Chat> Database::getChatList(User &user) {
     QSqlQuery query(db);
     std::stringstream ss;
-    ss << "SELECT id, name FROM QChat JOIN QChatUserList ON chat_id = id WHERE "
-          "user_id = "
+    ss << "SELECT id, name, is_group "
+          "FROM QChat JOIN QChatUserList ON chat_id = id "
+          "WHERE user_id = "
        << user.id << ";";
 
     if (m_debug) {
@@ -70,8 +71,8 @@ QList<Chat> Database::getChatList(User &user) {
     while (query.next()) {
         int id = query.value(0).toInt();
         QString name = query.value(1).toString();
-        //        QDate lastUpdated = query.value(2).toDate();
-        result.append(Chat{id, name, QDate()});
+        bool is_group = query.value(2).toBool();
+        result.append(Chat{id, name, is_group, QDate()});
     }
     return result;
 }
@@ -102,7 +103,7 @@ QList<Message> Database::getMessageList(int chatId) {
     return result;
 }
 
-bool Database::createChat(QString name, int user_id) {
+bool Database::createChat(QString name, int user_id, int &chat_id) {
     QSqlQuery query(db);
     std::stringstream ss;
 
@@ -114,7 +115,7 @@ bool Database::createChat(QString name, int user_id) {
     }
 
     if (query.exec(QString::fromStdString(ss.str()))) {
-        int chat_id = query.lastInsertId().toInt();
+        chat_id = query.lastInsertId().toInt();
         ss.str("");  // clear query string
         ss << "INSERT INTO QChatUserList (chat_id, user_id) VALUES (" << chat_id
            << ", " << user_id << ");";
@@ -173,4 +174,103 @@ QMap<int, QString> Database::getUserList(int chatId) {
     }
 
     return result;
+}
+
+QList<User> Database::getUserContacts(int user_id) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+    ss << "SELECT QUser.id, login FROM QUserContacts join QUser on quser.id = "
+          "user_id2 "
+          "where user_id1 = "
+       << user_id << ";";
+
+    if (m_debug) {
+        qDebug() << QString::fromStdString(ss.str());
+    }
+    query.exec(QString::fromStdString(ss.str()));
+
+    QList<User> result;
+    while (query.next()) {
+        int user_id = query.value(0).toInt();
+        QString login = query.value(1).toString();
+        result.append({user_id, login});
+    }
+
+    return result;
+}
+
+bool Database::addUserContact(int user_id1, int user_id2) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+
+    ss << "INSERT INTO QUserContacts (user_id1, user_id2) VALUES (" << user_id1
+       << ", " << user_id2 << ");";
+
+    if (m_debug) {
+        qDebug() << QString::fromStdString(ss.str());
+    }
+
+    return query.exec(QString::fromStdString(ss.str()));
+}
+
+bool Database::inviteUserChat(int user_id, int chat_id) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+
+    ss << "INSERT INTO QChatUserList (chat_id, user_id) VALUES (" << chat_id
+       << ", " << user_id << ");";
+
+    if (m_debug) {
+        qDebug() << QString::fromStdString(ss.str());
+    }
+
+    return query.exec(QString::fromStdString(ss.str()));
+}
+
+User Database::getUserProfile(int user_id) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+
+    ss << "SELECT id, login, status FROM QUser where id = " << user_id << ";";
+
+    if (m_debug) {
+        qDebug() << QString::fromStdString(ss.str());
+    }
+
+    query.exec(QString::fromStdString(ss.str()));
+
+    query.next();
+    int id = query.value(0).toInt();
+    QString login = query.value(1).toString();
+    QString status = query.value(2).toString();
+    User result{id, login, status};
+    return result;
+}
+
+bool Database::updateUserStatus(int user_id, QString status) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+
+    ss << "UPDATE QUser SET status = '" << status.toStdString()
+       << "' WHERE id = " << user_id << ";";
+
+    if (m_debug) {
+        qDebug() << QString::fromStdString(ss.str());
+    }
+
+    return query.exec(QString::fromStdString(ss.str()));
+}
+
+bool Database::updateUserLogin(int user_id, QString login) {
+    QSqlQuery query(db);
+    std::stringstream ss;
+
+    ss << "UPDATE QUser SET login = '" << login.toStdString()
+       << "' WHERE id = " << user_id << ";";
+
+    if (m_debug) {
+        qDebug() << QString::fromStdString(ss.str());
+    }
+
+    return query.exec(QString::fromStdString(ss.str()));
 }

@@ -39,7 +39,7 @@ private slots:
 
     void on_createChatButton_clicked();
 
-    void newChat(QString name);
+    void newChat(QString name, const QList<int> &);
 
     void on_actionDark_Theme_triggered();
 
@@ -49,25 +49,30 @@ private slots:
 
     void on_actionChange_my_photo_triggered();
 
-    void inviteUser(int id);
-    // todo: потом сделать этот метод или что-нибудь в этом роде) и кстати у
-    // чатов тоже кажется должен быть свой Id..
+    void on_actionUpdate_my_profile_triggered();
 
     void on_friends_clicked();
 
     void on_messages_clicked();
 
-    void on_friendList_itemDoubleClicked(QListWidgetItem *item);
+    void on_friendList_itemClicked(QListWidgetItem *item);
 
     void on_addFriend_clicked();
 
     void on_searchFriends_textEdited(const QString &arg1);
+
     void renderMessages(int chat_id);
+
+    void updateChats();
+
+    void updateLogin(QString login);
+
+    void updateStatus(QString status);
 
 private:
     void onConnectionUnstable();
-    void updateChats();
     void updateUsers();
+    void renderUsers(const QMap<int, QString> &userList);
     void updateUserProfile(int id, QString name);
     void renderChats(const QMap<int, QSharedPointer<Chat>> &);
 
@@ -75,5 +80,6 @@ private:
     Client client;
     QMap<int, QSharedPointer<Chat>> availableChats;
     QMap<int, QString> availibleUsers;
+    QMap<int, QString> contacts;
 };
 #endif  // MAINWINDOW_H

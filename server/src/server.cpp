@@ -84,6 +84,18 @@ void Server::processBinaryMessage(QByteArray message) {
         processUpdateUserPhoto(requestBody, pSender);
     } else if (requestMethod == "getUserPhoto") {
         processGetUserPhoto(requestBody, pSender);
+    } else if (requestMethod == "getContactList") {
+        processGetContactList(requestBody, pSender);
+    } else if (requestMethod == "addUserContact") {
+        processAddUserContact(requestBody, pSender);
+    } else if (requestMethod == "inviteUserChat") {
+        processInviteUserChat(requestBody, pSender);
+    } else if (requestMethod == "getUserProfile") {
+        processGetUserProfile(requestBody, pSender);
+    } else if (requestMethod == "updateUserStatus") {
+        processUpdateUserStatus(requestBody, pSender);
+    } else if (requestMethod == "updateUserLogin") {
+        processUpdateUserLogin(requestBody, pSender);
     }
 }
 

@@ -1,7 +1,6 @@
 #ifndef ECHOCLIENT_H
 #define ECHOCLIENT_H
 
-#include <chat.h>
 #include <QEventLoop>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -11,6 +10,8 @@
 #include <QtWebSockets/QWebSocket>
 #include <memory>
 #include <optional>
+#include "chat.h"
+#include "user.h"
 
 class Client : public QObject {
     Q_OBJECT
@@ -26,6 +27,7 @@ Q_SIGNALS:
     void responseRecieved();
     void connectionUnstable();
     void responsePushMessageReceived(int chat_id);
+    void responsePushChatMessageReceived();
 
 private Q_SLOTS:
     void onConnected();
@@ -44,8 +46,7 @@ public:
     int getId() const;
     bool sendMessage(const QSharedPointer<Message> &, int);
     bool logoutUser();
-    // QJsonArray searchMessage(QString message, QString chatId);
-    bool createChat(QString name);
+    bool createChat(QString name, int &chat_id);
     bool getChatList(QMap<int, QSharedPointer<Chat>> &chatList);
     bool getChatMessages(int chatId,
                          QList<QSharedPointer<Message>> &messageHistory);
@@ -55,7 +56,13 @@ public:
     bool loginUser(QString login, QString password);
     bool registerUser(QString login, QString password);
     bool updateUserPhoto(QImage &photo);
-    bool getUserPhoto(QImage &photo);
+    bool getUserPhoto(QImage &photo, int userId);
+    bool getContactList(QMap<int, QString> &);
+    bool inviteUserChat(int user_id, int chat_id);
+    bool addUserContact(int userId);
+    bool getUserProfile(User &user, int user_id);
+    bool updateUserStatus(QString newStatus);
+    bool updateUserLogin(QString newLogin);
 };
 
 #endif  // ECHOCLIENT_H

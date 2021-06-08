@@ -3,8 +3,6 @@
 #include <QList>
 #include <QString>
 #include <QWebSocket>
-#include "chat.h"
-#include "common.h"
 
 struct User {
     int id;

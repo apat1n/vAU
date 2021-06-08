@@ -50,6 +50,12 @@ private:
     void processGetUserList(QJsonObject, QWebSocket *);
     void processUpdateUserPhoto(QJsonObject, QWebSocket *);
     void processGetUserPhoto(QJsonObject, QWebSocket *);
+    void processGetContactList(QJsonObject, QWebSocket *);
+    void processAddUserContact(QJsonObject, QWebSocket *);
+    void processInviteUserChat(QJsonObject, QWebSocket *);
+    void processGetUserProfile(QJsonObject, QWebSocket *);
+    void processUpdateUserStatus(QJsonObject, QWebSocket *);
+    void processUpdateUserLogin(QJsonObject, QWebSocket *);
 
     bool isAuthorized(const QJsonObject &, QWebSocket *);
     bool updateUserPhoto(User &, QImage &);

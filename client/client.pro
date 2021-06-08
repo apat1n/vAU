@@ -17,6 +17,7 @@ SOURCES += \
     src/main.cpp \
     src/mainwindow.cpp \
     src/message.cpp \
+    src/updateprofile.cpp \
     src/utils.cpp
 
 HEADERS += \
@@ -24,11 +25,14 @@ HEADERS += \
     include/client.h \
     include/createChat.h \
     include/mainwindow.h \
-    include/message.h
+    include/message.h \
+    include/updateprofile.h \
+    include/user.h
 
 FORMS += \
     ui/mainwindow.ui \
-    ui/createChat.ui
+    ui/createChat.ui \
+    ui/updateprofile.ui
 
 INCLUDEPATH += include
 UI_DIR = ui

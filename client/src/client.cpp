@@ -73,7 +73,6 @@ void Client::onBinaryMessageReceived(QByteArray message) {
             .value("content")
             .toObject()
             .contains("push")) {
-        //        pushObj = messageJson;
         emit responsePushMessageReceived(messageJson.value("response")
                                              .toObject()
                                              .value("message")
@@ -82,6 +81,14 @@ void Client::onBinaryMessageReceived(QByteArray message) {
                                              .toObject()
                                              .value("chat_id")
                                              .toInt());
+    } else if (messageJson.value("response")
+                   .toObject()
+                   .value("message")
+                   .toObject()
+                   .value("content")
+                   .toObject()
+                   .contains("pushChat")) {
+        emit responsePushChatMessageReceived();
     } else {
         responseObj = messageJson;
         emit responseRecieved();

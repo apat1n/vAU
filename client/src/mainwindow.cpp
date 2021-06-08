@@ -5,6 +5,7 @@
 #include <utility>
 #include "createChat.h"
 #include "ui_mainwindow.h"
+#include "updateprofile.h"
 #include "utils.cpp"
 
 MainWindow::MainWindow(const QString &server_url, QWidget *parent)
@@ -13,10 +14,17 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->errorLogin->hide();
     ui->errorRegister->hide();
     client.connectServer();
-    QFile file(":/styles/light.qss");
+    this->setWindowTitle("vAU");
+
+    // load stylesheet
+    QFile file(":/styles/light/style.qss");
     file.open(QFile::ReadOnly);
     QString styleSheet = QLatin1String(file.readAll());
     qApp->setStyleSheet(styleSheet);
+
+    // remove cached images
+    QDir(QDir::currentPath() + "/" + "images").removeRecursively();
+
     ui->messageTextField->hide();
     ui->inputPassword->setEchoMode(QLineEdit::Password);
     ui->menuLog_Out->menuAction()->setVisible(false);
@@ -26,6 +34,8 @@ MainWindow::MainWindow(const QString &server_url, QWidget *parent)
     ui->stackedWidget_3->setCurrentIndex(0);
     connect(&client, &Client::responsePushMessageReceived, this,
             &MainWindow::renderMessages);
+    connect(&client, &Client::responsePushChatMessageReceived, this,
+            &MainWindow::updateChats);
 }
 
 MainWindow::~MainWindow() {
@@ -37,6 +47,9 @@ void MainWindow::on_signIn_clicked() {
     QString password = ui->inputPassword->text();
 
     if (client.loginUser(login, password)) {
+        // update contacts and chats
+        client.getUserList(availibleUsers);
+        client.getContactList(contacts);
         ui->stackedWidget->setCurrentIndex(1);
         ui->menuLog_Out->menuAction()->setVisible(true);
         updateChats();
@@ -52,6 +65,8 @@ void MainWindow::on_registerButton_clicked() {
     QString password = ui->inputPassword->text();
 
     if (client.registerUser(login, password)) {
+        client.getUserList(availibleUsers);
+        client.getContactList(contacts);
         ui->menuLog_Out->menuAction()->setVisible(true);
         updateChats();
         ui->stackedWidget->setCurrentIndex(1);
@@ -95,7 +110,6 @@ void MainWindow::on_search_textEdited(const QString &searchRequest) {
 }
 
 void MainWindow::renderChats(const QMap<int, QSharedPointer<Chat>> &chatsList) {
-    // client.getUserList(availibleUsers);
     clearListWidget(ui->chatMenu);
 
     for (QMap<int, QSharedPointer<Chat>>::const_iterator it =
@@ -155,8 +169,12 @@ void MainWindow::on_chatMenu_itemClicked(QListWidgetItem *item) {
     }
 }
 
-void MainWindow::newChat(QString name) {
-    if (client.createChat(name)) {
+void MainWindow::newChat(QString name, const QList<int> &user_list) {
+    int chat_id = 0;
+    if (client.createChat(name, chat_id)) {
+        for (auto it : user_list) {
+            client.inviteUserChat(it, chat_id);
+        }
         updateChats();
     }
 }
@@ -172,38 +190,65 @@ void MainWindow::updateChats() {
 }
 
 void MainWindow::updateUsers() {
-    QMap<int, QString> newUsers;
-    if (client.getUserList(newUsers)) {
+    QMap<int, QString> newAvailableUsers;
+    if (client.getUserList(newAvailableUsers)) {
         clearListWidget(ui->friendList);
-        QMap<int, QString>::Iterator i;
-        for (i = newUsers.begin(); i != newUsers.end(); i++) {
-            //            qDebug() << i.key() << " ";
-            QListWidgetItem *it = new QListWidgetItem;
-            it->setText(i.value());
-            it->setIcon(
-                QIcon(QPixmap::fromImage(getUserImage(i.key(), client))));
-            it->setData(Qt::UserRole, i.key());
-            ui->friendList->addItem(it);
-        }
+        availibleUsers.clear();
+        std::swap(newAvailableUsers, availibleUsers);
     }
+    QMap<int, QString> newAvailableContacts;
+    if (client.getContactList(newAvailableContacts)) {
+        clearListWidget(ui->friendList);
+        contacts.clear();
+        std::swap(newAvailableContacts, contacts);
+    }
+    renderUsers(contacts);
 }
 
-void MainWindow::inviteUser(int id) {
-    qDebug() << id;
+void MainWindow::renderUsers(const QMap<int, QString> &userList) {
+    clearListWidget(ui->friendList);
+    for (QMap<int, QString>::const_iterator it = userList.constBegin();
+         it != userList.constEnd(); ++it) {
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setText(it.value());
+        item->setData(Qt::UserRole, it.key());
+        item->setIcon(
+            QIcon(QPixmap::fromImage(getUserImage(it.key(), client))));
+        ui->friendList->addItem(item);
+    }
 }
 
 void MainWindow::on_actionDark_Theme_triggered() {
     if (ui->actionDark_Theme->isChecked()) {
-        QFile file(":/styles/dark.qss");
+        QFile file(":/styles/dark/style.qss");
         file.open(QFile::ReadOnly);
         QString styleSheet = QLatin1String(file.readAll());
         qApp->setStyleSheet(styleSheet);
     } else {
-        QFile file(":/styles/light.qss");
+        QFile file(":/styles/light/style.qss");
         file.open(QFile::ReadOnly);
         QString styleSheet = QLatin1String(file.readAll());
         qApp->setStyleSheet(styleSheet);
     }
+}
+
+void MainWindow::on_actionUpdate_my_profile_triggered() {
+    User profile;
+    client.getUserProfile(profile, client.getId());
+    updateProfile p(profile.login, profile.status);
+    connect(&p, SIGNAL(requestChangeLogin(QString)), this,
+            SLOT(updateLogin(QString)));
+    connect(&p, SIGNAL(requestChangeStatus(QString)), this,
+            SLOT(updateStatus(QString)));
+    p.exec();
+}
+
+void MainWindow::updateLogin(QString login) {
+    client.updateUserLogin(login);
+}
+
+void MainWindow::updateStatus(QString status) {
+    client.updateUserStatus(status);
 }
 
 void MainWindow::on_actionLog_Out_triggered() {
@@ -217,17 +262,29 @@ void MainWindow::on_actionMy_Profile_triggered() {
     ui->stackedWidget_3->setCurrentIndex(1);
     QImage icon = getUserImage(client.getId(), client);
     ui->label->setPixmap(QPixmap::fromImage(icon));
-    ui->label_2->setText(getUserStatus(client.getId()));
+    User profile;
+    client.getUserProfile(profile, client.getId());
+    ui->label_2->setText(profile.status);
+    ui->label_3->setText(profile.login);
+    QFont font = ui->label_3->font();
+    font.setPointSize(24);
+    ui->label_3->setFont(font);
+    font = ui->label_2->font();
+    font.setPointSize(12);
+    ui->label_2->setFont(font);
+
+    ui->label_4->hide();
+
+    ui->addFriend->hide();
 }
 
 void MainWindow::on_createChatButton_clicked() {
     QMap<int, QString> users;
     client.getUserList(users);
-    Dialog creating(client, users);
-    connect(&creating, SIGNAL(requestAddUser(int)), this,
-            SLOT(inviteUser(int)));
-    connect(&creating, SIGNAL(requestCreating(const QString &)), this,
-            SLOT(newChat(const QString &)));
+    Dialog creating(client, contacts);
+    connect(&creating,
+            SIGNAL(requestCreating(const QString &, const QList<int> &)), this,
+            SLOT(newChat(const QString &, const QList<int> &)));
 
     creating.exec();
 }
@@ -240,56 +297,79 @@ void MainWindow::on_friends_clicked() {
 void MainWindow::updateUserProfile(int id, QString name) {
     QImage icon = getUserImage(id, client);
     ui->label->setPixmap(QPixmap::fromImage(icon));
+    ui->label_4->show();
     QFont font = ui->label_3->font();
     font.setPointSize(24);
     ui->label_3->setFont(font);
     font = ui->label_2->font();
     font.setPointSize(12);
     ui->label_2->setFont(font);
-    ui->label_2->setText(getUserStatus(id));
-    ui->label_3->setText(name);
-    if (!ifFriend(id, client)) {
-        ui->label_4->setText("You can add this user to your friend list");
-        ui->addFriend->show();
-    } else {
+    User profile;
+    client.getUserProfile(profile, id);
+    ui->label_2->setText(profile.status);
+    ui->label_3->setText(profile.login);
+    if (contacts.contains(id)) {
         ui->label_4->setText("This user is already your friend");
         ui->addFriend->hide();
+    } else {
+        ui->label_4->setText("You can add this user to your friend list");
+        ui->addFriend->show();
     }
 }
 
 void MainWindow::on_messages_clicked() {
+    updateChats();
     ui->stackedWidget_2->setCurrentIndex(0);
 }
 
-void MainWindow::on_friendList_itemDoubleClicked(QListWidgetItem *item) {
+void MainWindow::on_friendList_itemClicked(QListWidgetItem *item) {
     updateUserProfile(item->data(Qt::UserRole).toInt(), item->text());
     ui->stackedWidget_3->setCurrentIndex(1);
 }
 
 void MainWindow::on_addFriend_clicked() {
+    int userId = ui->friendList->currentItem()->data(Qt::UserRole).toInt();
     ui->label_4->setText("Your request was sent");
     ui->addFriend->hide();
-    // send friend request
+    client.addUserContact(userId);
+    client.getContactList(contacts);
 }
 
 void MainWindow::on_actionChange_my_photo_triggered() {
-    QFileDialog d;
-    d.show();
+    QString newPhoto = QFileDialog::getOpenFileName(
+        this, "Upload a photo", "/home", "*.jpg *.png *.bmp");
+    QImage icon = QImage(newPhoto).scaled(256, 256);
+    ui->label->setPixmap(QPixmap::fromImage(icon));
+    User profile;
+    client.getUserProfile(profile, client.getId());
+    ui->label_2->setText(profile.status);
+    ui->label_3->setText(profile.login);
+    QFont font = ui->label_3->font();
+    font.setPointSize(24);
+    ui->label_3->setFont(font);
+    font = ui->label_2->font();
+    font.setPointSize(12);
+    ui->label_2->setFont(font);
+
+    ui->label_4->hide();
+
+    ui->addFriend->hide();
+    ui->stackedWidget_3->setCurrentIndex(1);
+    client.updateUserPhoto(icon);
 }
 
 void MainWindow::on_searchFriends_textEdited(const QString &arg1) {
-    ui->friendList->clear();
-    //    if (!arg1.isEmpty()) {
-    //        renderChats(foundUsers(ui->friendList, arg1));
-    //    } else {
-    //        QMap<int, QString> mp;
-    //        client.getUserList(mp);
-    //        QMap<int, QString>::iterator it;
-    //        for(it = mp.begin(); it!= mp.end(); it++){
-    //           QListWidgetItem* item;
-    //            item->setText(it.value());
-    //            item->setData(Qt::UserRole, it.key());
-    //            ui->friendList->addItem(item);
-    //        }
-    //    }
+    if (!arg1.isEmpty()) {
+        QMap<int, QString> result;
+        for (QMap<int, QString>::const_iterator it = availibleUsers.begin();
+             it != availibleUsers.end(); ++it) {
+            if (isMatch(it.value(), arg1)) {
+                result.insert(it.key(), it.value());
+            }
+        }
+        QMap<int, QString> tmp = result;
+        renderUsers(tmp);
+    } else {
+        renderUsers(contacts);
+    }
 }

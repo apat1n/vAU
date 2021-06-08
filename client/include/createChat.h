@@ -11,9 +11,7 @@ class Dialog;
 class Dialog : public QDialog {
     Q_OBJECT
 Q_SIGNALS:
-    void requestCreating(QString name);
-
-    void requestAddUser(int id);
+    void requestCreating(QString name, const QList<int> &);
 
 public:
     explicit Dialog(Client &client,

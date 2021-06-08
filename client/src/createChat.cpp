@@ -9,6 +9,7 @@ Dialog::Dialog(Client &client, QMap<int, QString> users_, QWidget *parent)
     : QDialog(parent), ui(new Ui::Dialog), client(client) {
     ui->setupUi(this);
     ui->avaliableUsers->setIconSize(QSize(32, 32));
+    this->setWindowTitle("Create a new chat");
     QMap<int, QString>::iterator i;
     for (i = users_.begin(); i != users_.end(); i++) {
         QListWidgetItem *it = new QListWidgetItem;
@@ -26,14 +27,15 @@ Dialog::~Dialog() {
 
 void Dialog::on_createChat_clicked() {
     QString name = ui->chatName->text();
+    QList<int> user_list;
     if (name != "") {
         for (int i = 0; i < ui->avaliableUsers->count(); i++) {
             if (ui->avaliableUsers->item(i)->checkState() == Qt::Checked) {
-                emit requestAddUser(
+                user_list.append(
                     ui->avaliableUsers->item(i)->data(Qt::UserRole).toInt());
             }
         }
-        emit requestCreating(name);
+        emit requestCreating(name, user_list);
         this->close();
     }
 }

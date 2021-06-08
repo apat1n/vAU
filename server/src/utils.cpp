@@ -16,14 +16,15 @@ static void saveImage(const QImage &image, const QString &filename) {
     if (!dirPath.exists()) {
         dirPath.mkpath(".");
     }
-    image.save(dirPath.absolutePath() + "/" + filename);
+    image.save(dirPath.absolutePath() + "/" + filename, "PNG");
 }
 
 static QImage loadImage(const QString &filename) {
-    if (!QDir(QDir::currentPath() + "/" + "images" + "/" + filename).exists()) {
+    QString filePath = QDir::currentPath() + "/" + "images" + "/" + filename;
+    if (!QFile::exists(filePath)) {
         throw std::runtime_error("no such image!");
     }
-    return QImage(QDir::currentPath() + "/" + "images" + "/" + filename);
+    return QImage(filePath);
 }
 
 // For creating response with method and status
