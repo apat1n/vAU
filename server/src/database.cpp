@@ -25,7 +25,8 @@ bool Database::authUser(User &user, QString password) {
     QSqlQuery query(db);
     QString queryLogin = user.login;
     std::stringstream ss;
-    ss << "SELECT * FROM QUser WHERE login = '" << queryLogin.toStdString()
+    ss << "SELECT * FROM QUser WHERE login = '"
+       << QByteArray(queryLogin.toStdString().c_str()).toBase64().toStdString()
        << "';";
     query.exec(QString::fromStdString(ss.str()));
 
@@ -35,11 +36,11 @@ bool Database::authUser(User &user, QString password) {
 
     query.next();
     int id = query.value(0).toInt();
-    QString login = query.value(1).toString();
+    QString login = QByteArray::fromBase64(query.value(1).toByteArray());
     QString password_hash = query.value(2).toString();
 
     user.id = id;
-
+    user.login = login;
     return password_hash == password;
 }
 
@@ -48,7 +49,8 @@ bool Database::registerUser(QString login, QString password) {
     std::stringstream ss;
 
     ss << "INSERT INTO QUser (login, password_hash) VALUES ('"
-       << login.toStdString() << "', '" << password.toStdString() << "');";
+       << QByteArray(login.toStdString().c_str()).toBase64().toStdString()
+       << "', '" << password.toStdString() << "');";
 
     return query.exec(QString::fromStdString(ss.str()));
 }
@@ -70,7 +72,7 @@ QList<Chat> Database::getChatList(User &user) {
     QList<Chat> result;
     while (query.next()) {
         int id = query.value(0).toInt();
-        QString name = query.value(1).toString();
+        QString name = QByteArray::fromBase64(query.value(1).toByteArray());
         bool is_group = query.value(2).toBool();
         result.append(Chat{id, name, is_group, QDate()});
     }
@@ -107,7 +109,8 @@ bool Database::createChat(QString name, int user_id, int &chat_id) {
     QSqlQuery query(db);
     std::stringstream ss;
 
-    ss << "INSERT INTO QChat (name, creator_id) VALUES ('" << name.toStdString()
+    ss << "INSERT INTO QChat (name, creator_id) VALUES ('"
+       << QByteArray(name.toStdString().c_str()).toBase64().toStdString()
        << "', " << user_id << ");";
 
     if (m_debug) {
@@ -169,7 +172,8 @@ QMap<int, QString> Database::getUserList(int chatId) {
     QMap<int, QString> result;
     while (query.next()) {
         int user_id = query.value(0).toInt();
-        QString user_name = query.value(1).toString();
+        QString user_name =
+            QByteArray::fromBase64(query.value(1).toByteArray());
         result[user_id] = user_name;
     }
 
@@ -192,7 +196,7 @@ QList<User> Database::getUserContacts(int user_id) {
     QList<User> result;
     while (query.next()) {
         int user_id = query.value(0).toInt();
-        QString login = query.value(1).toString();
+        QString login = QByteArray::fromBase64(query.value(1).toByteArray());
         result.append({user_id, login});
     }
 
@@ -241,8 +245,8 @@ User Database::getUserProfile(int user_id) {
 
     query.next();
     int id = query.value(0).toInt();
-    QString login = query.value(1).toString();
-    QString status = query.value(2).toString();
+    QString login = QByteArray::fromBase64(query.value(1).toByteArray());
+    QString status = QByteArray::fromBase64(query.value(2).toByteArray());
     User result{id, login, status};
     return result;
 }
@@ -251,7 +255,8 @@ bool Database::updateUserStatus(int user_id, QString status) {
     QSqlQuery query(db);
     std::stringstream ss;
 
-    ss << "UPDATE QUser SET status = '" << status.toStdString()
+    ss << "UPDATE QUser SET status = '"
+       << QByteArray(status.toStdString().c_str()).toBase64().toStdString()
        << "' WHERE id = " << user_id << ";";
 
     if (m_debug) {
@@ -265,7 +270,8 @@ bool Database::updateUserLogin(int user_id, QString login) {
     QSqlQuery query(db);
     std::stringstream ss;
 
-    ss << "UPDATE QUser SET login = '" << login.toStdString()
+    ss << "UPDATE QUser SET login = '"
+       << QByteArray(login.toStdString().c_str()).toBase64().toStdString()
        << "' WHERE id = " << user_id << ";";
 
     if (m_debug) {
