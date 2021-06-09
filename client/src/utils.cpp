@@ -63,16 +63,6 @@ static void clearListWidget(QListWidget *listWidget) {
     }
 }
 
-static QString getUserStatus(int id, Client &client) {
-    return "";
-}
-
-static QIcon getChatImage(int id) {
-    QPixmap pixmap(1000, 1000);
-    pixmap.fill(Qt::red);
-    return QIcon(pixmap);
-}
-
 static void saveImage(const QImage &image, const QString &filename) {
     QDir dirPath = QDir::currentPath() + "/" + "images";
     if (!dirPath.exists()) {
@@ -104,6 +94,20 @@ static QImage getUserImage(int id, Client &client) {
         saveImage(photo, filePath);
     }
     return photo;
+}
+
+static QIcon getChatImage(int id, Client &client) {
+    QMap<int, QString> users;
+    client.getUserList(users, id);
+    for (QMap<int, QString>::iterator it = users.begin(); it != users.end();
+         ++it) {
+        if (it.key() != client.getId()) {
+            return QPixmap::fromImage(getUserImage(it.key(), client));
+        }
+    }
+    QPixmap pixmap(1000, 1000);
+    pixmap.fill(Qt::blue);
+    return QIcon(pixmap);
 }
 
 /*

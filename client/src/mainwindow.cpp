@@ -116,7 +116,7 @@ void MainWindow::renderChats(const QMap<int, QSharedPointer<Chat>> &chatsList) {
              chatsList.constBegin();
          it != chatsList.constEnd(); ++it) {
         QListWidgetItem *item = it.value().get();
-        item->setIcon(getChatImage(it.value()->getChatId()));
+        item->setIcon(getChatImage(it.value()->getChatId(), client));
         item->setText(it.value()->getName());
         ui->chatMenu->addItem(it.value().get());
     }
@@ -241,7 +241,6 @@ void MainWindow::on_actionUpdate_my_profile_triggered() {
     connect(&p, SIGNAL(requestChangeStatus(QString)), this,
             SLOT(updateStatus(QString)));
     p.exec();
-
 }
 
 void MainWindow::updateLogin(QString login) {
