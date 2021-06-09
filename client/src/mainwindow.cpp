@@ -241,13 +241,16 @@ void MainWindow::on_actionUpdate_my_profile_triggered() {
     connect(&p, SIGNAL(requestChangeStatus(QString)), this,
             SLOT(updateStatus(QString)));
     p.exec();
+
 }
 
 void MainWindow::updateLogin(QString login) {
+    ui->label_3->setText(login);
     client.updateUserLogin(login);
 }
 
 void MainWindow::updateStatus(QString status) {
+    ui->label_2->setText(status);
     client.updateUserStatus(status);
 }
 
@@ -308,7 +311,7 @@ void MainWindow::updateUserProfile(int id, QString name) {
     client.getUserProfile(profile, id);
     ui->label_2->setText(profile.status);
     ui->label_3->setText(profile.login);
-    if (contacts.contains(id)) {
+    if (contacts.contains(id) || id == client.getId()) {
         ui->label_4->setText("This user is already your friend");
         ui->addFriend->hide();
     } else {
@@ -356,6 +359,7 @@ void MainWindow::on_actionChange_my_photo_triggered() {
     ui->addFriend->hide();
     ui->stackedWidget_3->setCurrentIndex(1);
     client.updateUserPhoto(icon);
+    getUserImage(client.getId(), client);
 }
 
 void MainWindow::on_searchFriends_textEdited(const QString &arg1) {
